@@ -1,0 +1,2425 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>01 La présentation et la méthodologie du bulletin de salaire</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Styles de base pour le corps de la page */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #dbeafe; /* Fond bleu très clair (Tailwind blue-50) */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh; /* Hauteur minimale de la fenêtre */
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        /* Conteneur principal du quiz */
+        .quiz-container {
+            background-color: #ffffff; /* Fond blanc */
+            border-radius: 15px; /* Coins arrondis */
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); /* Ombre douce */
+            padding: 30px;
+            max-width: 800px; /* Largeur maximale pour la lisibilité */
+            width: 100%; /* Pleine largeur sur petits écrans */
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            gap: 20px; /* Espacement entre les éléments */
+        }
+        /* Style du texte de la question */
+        .question-text {
+            font-size: 1.5rem; /* Taille de police plus grande */
+            font-weight: 600; /* Semi-gras */
+            color: #333; /* Texte gris foncé */
+            margin-bottom: 20px;
+        }
+        /* Style des options de réponse individuelles */
+        .answer-option {
+            background-color: #e2e8f0; /* Gris-bleu clair */
+            border-radius: 10px; /* Coins arrondis */
+            padding: 15px 20px;
+            margin-bottom: 10px;
+            cursor: pointer; /* Indique que l'élément est clickable */
+            transition: background-color 0.3s ease, transform 0.2s ease; /* Transitions douces */
+            text-align: left;
+            font-size: 1.1rem;
+            color: #4a5568; /* Texte gris moyen */
+            border: 2px solid transparent; /* Bordure transparente pour la sélection */
+        }
+        /* Effet au survol des options de réponse */
+        .answer-option:hover {
+            background-color: #93c5fd; /* Bleu plus doux (Tailwind blue-300) au survol */
+            transform: translateY(-2px); /* Léger effet de soulèvement */
+        }
+        /* Style de l'option de réponse correcte */
+        .answer-option.correct {
+            background-color: #bfdbfe; /* Bleu-200 */
+            border-color: #3b82f6; /* Bleu-500 */
+        }
+        /* Style de l'option de réponse incorrecte */
+        .answer-option.incorrect {
+            background-color: #fce7f6; /* Pink-100 (plus clair) */
+            border-color: #ec4899; /* Pink-500 (plus fuchsia) */
+        }
+        /* Style de l'option de réponse sélectionnée par l'utilisateur */
+        .answer-option.selected {
+            background-color: #fffef0; /* Jaune-100 */
+            border-color: #eab308; /* Jaune-500 */
+        }
+        /* Style du texte de la justification (rationale) */
+        .rationale {
+            font-size: 0.95rem;
+            margin-top: 5px;
+            padding: 10px;
+            border-radius: 8px;
+            text-align: left;
+            color: #4a5568;
+            background-color: #f0f2f5;
+            border-left: 4px solid #60a5fa; /* Bordure gauche bleue-400 */
+        }
+        /* Style spécifique de la justification pour les réponses correctes */
+        .rationale.correct-rationale {
+            border-left-color: #3b82f6; /* Bleu-500 */
+            background-color: #e0f2fe; /* Bleu-100 */
+        }
+        /* Style spécifique de la justification pour les réponses incorrectes */
+        .rationale.incorrect-rationale {
+            border-left-color: #ec4899; /* Pink-500 (plus fuchsia) */
+            background-color: #fce7f6; /* Pink-100 (plus clair) */
+        }
+        /* Style spécifique de la justification pour la réponse sélectionnée par l'utilisateur */
+        .rationale.selected-rationale {
+            border-left-color: #eab308; /* Jaune-500 */
+            background-color: #fffef0; /* Jaune-100 */
+        }
+        /* Style général des boutons */
+        .button {
+            background-color: #1d4ed8; /* Fond bleu profond (Tailwind blue-700) */
+            color: white; /* Texte blanc */
+            padding: 12px 25px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: 500;
+            transition: background-color 0.3s ease, transform 0.2s ease; /* Transitions douces */
+            border: none;
+            box-shadow: 0 4px 10px rgba(66, 153, 225, 0.3); /* Ombre douce */
+        }
+        /* Effet au survol des boutons */
+        .button:hover {
+            background-color: #1e40af; /* Bleu plus foncé au survol (Tailwind blue-800) */
+            transform: translateY(-2px); /* Léger effet de soulèvement */
+        }
+        /* État désactivé des boutons */
+        .button:disabled {
+            background-color: #a0aec0; /* Grisé lorsque désactivé */
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+        /* Conteneur de la barre de progression */
+        .progress-bar {
+            width: 100%;
+            height: 20px; /* Plus épais */
+            background-color: #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 5px; /* Moins de marge pour rapprocher du score */
+            display: flex; /* Utiliser flexbox pour les segments */
+            font-weight: bold; /* Texte en gras dans la barre */
+            color: white; /* Texte blanc par default pour les sections colorées */
+            font-size: 0.9em; /* Taille du texte dans la barre */
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5); /* Ombre pour la lisibilité */
+        }
+        /* Sections de la barre de progression et du graphique final */
+        .progress-section {
+            height: 100%;
+            display: flex; /* Pour centrer le texte */
+            align-items: center;
+            justify-content: center;
+            transition: width 0.3s ease-in-out; /* Transition de largeur douce */
+            box-sizing: border-box; /* Pour inclure padding/border dans la largeur */
+        }
+        .correct-section { background-color: #1d4ed8; } /* Bleu profond (Tailwind blue-700) */
+        .incorrect-section { background-color: #ec4899; } /* Fuchsia */
+        .unanswered-section { background-color: #93c5fd; color: #4a5568; text-shadow: none; } /* Bleu doux (Tailwind blue-300), texte foncé */
+        /* Style de l'affichage du score final */
+        .score-display {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #2d3748; /* Texte gris foncé */
+            margin-bottom: 20px;
+        }
+        /* Style du texte de l'indice */
+        .hint-text {
+            font-style: italic;
+            color: #718096; /* Texte gris atténué */
+            margin-top: 10px;
+            font-size: 0.9rem;
+        }
+        .live-score-display {
+            font-size: 1.1rem; /* Plus grand */
+            font-weight: 600; /* Plus gras */
+            color: #333;
+            margin-top: 0px; /* Moins de marge pour rapprocher de la barre */
+            margin-bottom: 10px;
+            text-align: center; /* Centrer le texte */
+        }
+
+        /* Style spécifique pour la barre de résultats finaux */
+        .final-results-chart-container {
+            height: 30px; /* Plus épais pour le graphique final */
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+        /* Pour le graphique final, on ne veut qu'une seule section pour le correct */
+        .final-results-chart-container .incorrect-section,
+        .final-results-chart-container .unanswered-section {
+            display: none; /* Cacher ces sections dans le graphique final */
+        }
+        .final-results-chart-container .correct-section {
+            width: 100% !important; /* Force la section correcte à prendre toute la largeur disponible */
+            justify-content: center; /* Centrer le texte */
+        }
+        /* Style pour le pied de page */
+        .footer-links {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #cbd5e0; /* Bordure fine grise */
+            font-size: 0.85rem; /* Texte plus petit */
+            color: #4a5568;
+        }
+        .footer-links a {
+            color: #1d4ed8; /* Bleu profond pour les liens */
+            font-weight: 600;
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+        .footer-links a:hover {
+            color: #1e40af; /* Bleu plus foncé au survol */
+            text-decoration: underline;
+        }
+        .footer-links .discord-button {
+            background-color: #5865F2; /* Couleur Discord */
+            color: white;
+            padding: 8px 15px;
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            transition: background-color 0.2s ease;
+        }
+        .footer-links .discord-button:hover {
+            background-color: #4752C4;
+        }
+        .footer-links .whatsapp-button {
+            background-color: #25D366; /* Couleur WhatsApp */
+            color: white;
+            padding: 8px 15px;
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            transition: background-color 0.2s ease;
+        }
+        .footer-links .whatsapp-button:hover {
+            background-color: #1DA851;
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container">
+        <h1 class="text-3xl font-bold text-gray-800 mb-6">01 La présentation et la méthodologie du bulletin de salaire</h1>
+        <div id="liveScoreDisplay" class="live-score-display"></div>
+        <div class="progress-bar" id="progressBar">
+            <!-- Sections de progression seront insérées ici par JavaScript -->
+            <div class="progress-section correct-section" id="correctProgress"></div>
+            <div class="progress-section incorrect-section" id="incorrectProgress"></div>
+            <div class="progress-section unanswered-section" id="unansweredProgress"></div>
+        </div>
+        <div id="quiz" class="flex flex-col gap-4">
+            <!-- La question et les réponses seront chargées ici par JavaScript -->
+        </div>
+        <div id="navigation" class="flex justify-between mt-6">
+            <button id="prevButton" class="button" disabled>Précédent</button>
+            <button id="nextButton" class="button">Suivant</button>
+        </div>
+        <button id="restartButton" class="button mt-6 hidden">Recommencer le Quiz</button>
+
+        <!-- Section de pied de page visible sur toutes les pages -->
+        <div class="footer-links">
+            <p class="text-sm font-semibold text-gray-700 mb-4">
+                🚀 Prêt(e) à aller plus loin ? Rejoignez notre communauté pour échanger et progresser ensemble !
+            </p>
+            <div class="flex justify-center gap-4">
+                <a href="https://discord.gg/cBnBkGDFgk" target="_blank" class="discord-button">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M20.22 0H3.78C1.7 0 0 1.7 0 3.78v16.44C0 22.3 1.7 24 3.78 24h16.44c2.08 0 3.78-1.7 3.78-3.78V3.78C24 1.7 22.3 0 20.22 0zM17.22 17.22H6.78V6.78h10.44v10.44zm-1.04-7.29a.94.94 0 01-.94.94h-2.18v2.18a.94.94 0 01-1.88 0v-2.18H8.81a.94.94 0 010-1.88h2.18V8.81a.94.94 0 011.88 0v2.18h2.18a.94.94 0 01.94.94z"/>
+                        <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.219 17.839c-.469.096-.948.145-1.428.145-1.921 0-3.842-.73-5.303-2.191-1.46-1.46-2.191-3.382-2.191-5.303 0-.48.049-.959.145-1.428.096-.469.23-.92.399-1.348.17-.428.375-.83.615-1.205.24-.375.508-.72.804-1.034.296-.314.62-.59.972-.828.352-.238.72-.435 1.104-.588.384-.153.78-.261 1.188-.324.408-.063.82-.093 1.23-.093.41 0 .82.03 1.23.093.408.063.816.171 1.188.324.384.153.752.35 1.104.588.352.238.676.514.972.828.296.314.564.659.804 1.034.24.375.445.777.615 1.205.17.428.303.879.399 1.348.096.469.145.948.145 1.428 0 1.921-.73 3.842-2.191 5.303-1.46 1.46-3.382 2.191-5.303 2.191zM12 19.5c-4.142 0-7.5-3.358-7.5-7.5S7.858 4.5 12 4.5s7.5 3.358 7.5 7.5-3.358 7.5-7.5 7.5zM12 5c-3.866 0-7 3.134-7 7s3.134 7 7 7 7-3.134 7-7-3.134-7-7-7z"/>
+                    </svg>
+                    Discord 🔥 Payroll Boss Elite Club : Le Hub Paie & Progrès 📈
+                </a>
+                <a href="https://chat.whatsapp.com/FuBgQZStV0r2dgIDxJe2g9" target="_blank" class="whatsapp-button">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M12.03 2.03c-5.52 0-10 4.48-10 10s4.48 10 10 10 10-4.48 10-10-4.48-10-10-10zm.01 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm3.82-10.15c-.22-.12-.49-.18-.77-.18-.28 0-.55.06-.77.18-.22.12-.39.29-.49.49-.1.2-.15.44-.15.71 0 .27.05.5.15.71.1.2.27.37.49.49.22.12.49.18.77.18.28 0 .55-.06.77-.18.22-.12.39-.29.49-.49.1-.2.15-.44.15-.71 0-.27-.05-.5-.15-.71-.1-.2-.27-.37-.49-.49zm-7.64 0c-.22-.12-.49-.18-.77-.18-.28 0-.55.06-.77.18-.22.12-.39.29-.49.49-.1.2-.15.44-.15.71 0 .27.05.5.15.71.1.2.27.37.49.49.22.12.49.18.77.18.28 0 .55-.06.77-.18.22-.12.39-.29.49-.49.1-.2.15-.44.15-.71 0-.27-.05-.5-.15-.71-.1-.2-.27-.37-.49-.49z"/>
+                    </svg>
+                    WhatsApp 🔥 | Payroll Boss Elite Club 👑| Infos & Actus
+                </a>
+            </div>
+            <p class="text-xs mt-4 text-gray-500">
+                Payroll Boss Elite Club 👑|
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // Données du quiz
+        const quizData = {
+            "questions": [
+                {
+                    "question": "Quelle est la principale obligation de l'employeur concernant le bulletin de paie, selon le Code du travail ?",
+                    "hint": "Il s'agit d'une pièce justificative essentielle pour le salarié.",
+                    "answerOptions": [
+                        {
+                            "text": "Le conserver pendant 10 ans.",
+                            "rationale": "❌ C'est incorrect. La conservation est une obligation, mais la principale obligation est la remise au salarié.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Le remettre au salarié comme pièce justificative du paiement du salaire.",
+                            "rationale": "✅ C'est la bonne réponse. L'article L3243-2 du Code du travail dispose que l'employeur doit remettre au salarié un bulletin de salaire comme pièce justificative du paiement du salaire.",
+                            "isCorrect": true
+                        },
+                        {
+                            "text": "Le transmettre uniquement par voie électronique.",
+                            "rationale": "❌ C'est incorrect. La dématérialisation est le principe, mais le salarié peut s'y opposer et demander une version papier.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Obtenir l'accord préalable du salarié avant chaque remise.",
+                            "rationale": "❌ C'est incorrect. L'accord préalable n'est plus nécessaire pour la dématérialisation depuis 2017, sauf opposition du salarié.",
+                            "isCorrect": false
+                        }
+                    ]
+                },
+                {
+                    "question": "Depuis quand le bulletin de paie 'simplifié' ou 'clarifié' est-il obligatoire pour tous les employeurs en France ?",
+                    "hint": "Il y a eu une généralisation progressive de ce nouveau format.",
+                    "answerOptions": [
+                        {
+                            "text": "Depuis le 1er mars 2016.",
+                            "rationale": "❌ C'est incorrect. Cette date marque l'introduction de la possibilité de remettre le bulletin simplifié, mais pas son obligation pour tous.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Depuis le 1er janvier 2017.",
+                            "rationale": "❌ C'est incorrect. Cette date marque l'obligation pour les entreprises d'au moins 300 salariés, pas pour tous.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Depuis le 1er janvier 2018.",
+                            "rationale": "✅ C'est la bonne réponse. Le bulletin de paie simplifié s'est imposé à tous les employeurs à partir du 1er janvier 2018.",
+                            "isCorrect": true
+                        },
+                        {
+                            "text": "Depuis le 1er juillet 2023.",
+                            "rationale": "❌ C'est incorrect. Cette date marque l'obligation d'afficher le montant net social, pas la généralisation du bulletin simplifié.",
+                            "isCorrect": false
+                        }
+                    ]
+                },
+                {
+                    "question": "Quelle est la sanction principale pour un employeur qui ne respecte pas les dispositions relatives au bulletin de paie ?",
+                    "hint": "Il s'agit d'une amende prévue par le Code du travail.",
+                    "answerOptions": [
+                        {
+                            "text": "Une peine d'emprisonnement.",
+                            "rationale": "❌ C'est incorrect. La peine d'emprisonnement est associée à des délits plus graves, comme le travail dissimulé, mais pas directement à la simple méconnaissance des dispositions sur le bulletin de paie.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Une amende prévue pour les contraventions de la troisième classe (450 €).",
+                            "rationale": "✅ C'est la bonne réponse. L'article R3246-2 du Code du travail dispose que la méconnaissance des dispositions relatives au bulletin de paie est punie de l'amende prévue pour les contraventions de la troisième classe, soit 450 €.",
+                            "isCorrect": true
+                        },
+                        {
+                            "text": "Des dommages et intérêts au salarié uniquement.",
+                            "rationale": "❌ C'est incorrect. Le salarié peut obtenir des dommages et intérêts en cas de préjudice, mais la sanction principale pour l'employeur est une amende.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "La nullité du contrat de travail.",
+                            "rationale": "❌ C'est incorrect. Le non-respect des dispositions sur le bulletin de paie n'entraîne pas la nullité du contrat de travail.",
+                            "isCorrect": false
+                        }
+                    ]
+                },
+                {
+                    "question": "Quel est l'objectif principal de l'introduction du 'montant net social' sur le bulletin de paie depuis le 1er juillet 2023 ?",
+                    "hint": "Cette mention vise à faciliter les démarches pour certaines prestations sociales.",
+                    "answerOptions": [
+                        {
+                            "text": "Simplifier le calcul du revenu imposable du salarié.",
+                            "rationale": "❌ C'est incorrect. Le montant net social est distinct du revenu imposable, bien que les deux figurent sur le bulletin.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Informer les salariés sur le coût total de leur emploi pour l'employeur.",
+                            "rationale": "❌ C'est incorrect. Le coût employeur est une autre information présente, mais pas l'objectif du net social.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Faciliter la déclaration des ressources aux organismes sociaux (CAF, MSA) pour le calcul des prestations.",
+                            "rationale": "✅ C'est la bonne réponse. Le montant net social représente les revenus à prendre en compte pour le calcul de certaines prestations sociales (comme la prime d'activité ou le RSA), simplifiant ainsi les démarches des salariés auprès des organismes comme la CAF ou la MSA.",
+                            "isCorrect": true
+                        },
+                        {
+                            "text": "Permettre au gestionnaire de paie de mieux contrôler les cotisations.",
+                            "rationale": "❌ C'est incorrect. Le montant net social est une information destinée au salarié, pas un outil de contrôle pour le gestionnaire de paie.",
+                            "isCorrect": false
+                        }
+                    ]
+                },
+                {
+                    "question": "Parmi les éléments suivants, lequel est une mention OBLIGATOIRE qui doit figurer sur un bulletin de paie ?",
+                    "hint": "Pensez aux informations essentielles pour identifier l'emploi et la rémunération.",
+                    "answerOptions": [
+                        {
+                            "text": "L'adresse personnelle du salarié.",
+                            "rationale": "❌ C'est incorrect. L'adresse du salarié est une mention facultative sur le bulletin de paie.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Le montant des primes exceptionnelles non soumises à cotisations.",
+                            "rationale": "❌ C'est incorrect. Le montant des sommes non soumises à cotisations doit figurer, mais la question porte sur une mention obligatoire générale.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "L'intitulé de l'emploi et la position dans la classification selon la convention collective.",
+                            "rationale": "✅ C'est la bonne réponse. Le bulletin de paie doit obligatoirement inclure l'intitulé de l'emploi, la position du salarié dans la classification de la convention collective (niveau, coefficient, indice).",
+                            "isCorrect": true
+                        },
+                        {
+                            "text": "La date de naissance du salarié.",
+                            "rationale": "❌ C'est incorrect. La date de naissance du salarié n'est pas une mention obligatoire sur le bulletin de paie.",
+                            "isCorrect": false
+                        }
+                    ]
+                },
+                {
+                    "question": "Quelle est la durée minimale de conservation des bulletins de paie par l'employeur selon le Code du travail et le Code de commerce ?",
+                    "hint": "Deux durées différentes sont mentionnées pour des raisons distinctes.",
+                    "answerOptions": [
+                        {
+                            "text": "5 ans (Code du travail) et 10 ans (Code de commerce).",
+                            "rationale": "✅ C'est la bonne réponse. L'employeur est tenu de conserver les bulletins de paie pendant une durée minimale de 5 ans selon le Code du travail, et les documents comptables (y compris les bulletins de paie) pendant au moins 10 ans selon le Code de commerce.",
+                            "isCorrect": true
+                        },
+                        {
+                            "text": "5 ans pour les versions papier et 50 ans pour les versions électroniques.",
+                            "rationale": "❌ C'est incorrect. La durée de 50 ans ou jusqu'à 75 ans du salarié concerne la disponibilité des bulletins électroniques pour le salarié, pas la conservation par l'employeur.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "10 ans pour tous les bulletins, quel que soit le support.",
+                            "rationale": "❌ C'est incorrect. Le Code du travail mentionne 5 ans, et le Code de commerce 10 ans pour les documents comptables.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "À vie, car ils sont essentiels pour les droits à la retraite.",
+                            "rationale": "❌ C'est incorrect. La recommandation de conserver à vie est pour le salarié, pas une obligation de l'employeur.",
+                            "isCorrect": false
+                        }
+                    ]
+                },
+                {
+                    "question": "Vrai ou Faux : L'employeur a l'obligation de remettre un duplicata au salarié si celui-ci a perdu son bulletin de paie.",
+                    "hint": "Pensez à la responsabilité de conservation du salarié.",
+                    "answerOptions": [
+                        {
+                            "text": "Vrai",
+                            "rationale": "❌ C'est incorrect. L'employeur n'est pas tenu de remettre un duplicata. Le salarié est responsable de la conservation de ses bulletins.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Faux",
+                            "rationale": "✅ C'est la bonne réponse. L'employeur n'est pas dans l'obligation de remettre un duplicata au salarié si celui-ci a perdu son bulletin de salaire. Il est fortement recommandé aux salariés de conserver leurs bulletins à vie.",
+                            "isCorrect": true
+                        }
+                    ]
+                },
+                {
+                    "question": "Lors de la méthodologie de réalisation d'un bulletin de paie, quelle est la première étape essentielle concernant les données de l'entreprise ?",
+                    "hint": "Il s'agit de paramétrer les éléments généraux qui impactent tous les bulletins.",
+                    "answerOptions": [
+                        {
+                            "text": "Reporter les informations essentielles du salarié dans le bulletin.",
+                            "rationale": "❌ C'est incorrect. Les informations du salarié sont une étape ultérieure. La première étape concerne l'entreprise dans sa globalité.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Vérifier le montant du salaire brut de chaque salarié.",
+                            "rationale": "❌ C'est incorrect. La vérification du salaire brut est une étape de contrôle après la saisie des variables.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Extraire toutes les données générales de l'entreprise pour les reporter sur les paramétrages de la paie.",
+                            "rationale": "✅ C'est la bonne réponse. La première étape de la méthodologie de paie est de 'penser à la paie de l'entreprise globalement : extraire toutes les données générales de l'entreprise pour les reporter sur les paramétrages de la paie, en tirer les conséquences et ne rien oublier'. Cela inclut les taux AT, l'effectif, le versement mobilité, les mutuelles, etc.",
+                            "isCorrect": true
+                        },
+                        {
+                            "text": "Calculer la base CSG/CRDS pour tous les salariés.",
+                            "rationale": "❌ C'est incorrect. Le calcul de la base CSG/CRDS est une vérification spécifique après avoir paramétré les données générales de l'entreprise.",
+                            "isCorrect": false
+                        }
+                    ]
+                },
+                {
+                    "question": "Quel est l'objectif principal du regroupement des cotisations sur le bulletin de paie simplifié ?",
+                    "hint": "Cette simplification vise à rendre le document plus accessible pour le salarié.",
+                    "answerOptions": [
+                        {
+                            "text": "Réduire le nombre de lignes sur le bulletin pour économiser du papier.",
+                            "rationale": "❌ C'est incorrect. Bien que ce soit une conséquence, l'objectif principal est la compréhension, pas l'économie de papier.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Faciliter le contrôle des calculs de paie par le gestionnaire.",
+                            "rationale": "❌ C'est incorrect. Le bulletin simplifié n'est pas conçu pour le contrôle détaillé des calculs par le gestionnaire, qui utilise plutôt le bulletin détaillé.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Rendre plus compréhensible le système français de protection sociale pour le salarié.",
+                            "rationale": "✅ C'est la bonne réponse. L'objectif du bulletin simplifié est de rendre plus compréhensible le système français fondé sur la solidarité en regroupant les cotisations sociales par risque (santé, retraite, chômage, etc.) et de donner du sens au bulletin de paie.",
+                            "isCorrect": true
+                        },
+                        {
+                            "text": "Cacher certaines cotisations au salarié.",
+                            "rationale": "❌ C'est incorrect. L'objectif est la transparence et la simplification, pas la dissimulation.",
+                            "isCorrect": false
+                        }
+                    ]
+                },
+                {
+                    "question": "Quelle est la particularité de la cotisation 'Prévoyance Cadre' mentionnée dans la rubrique 'Santé' du bulletin simplifié ?",
+                    "hint": "Elle est obligatoire et financée par l'employeur pour une catégorie spécifique de salariés.",
+                    "answerOptions": [
+                        {
+                            "text": "Elle est facultative et à la charge exclusive du salarié.",
+                            "rationale": "❌ C'est incorrect. La prévoyance cadre est obligatoire pour les employeurs et a une part patronale.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Elle est obligatoire pour les salariés cadres et inclut une garantie décès financée par l'employeur.",
+                            "rationale": "✅ C'est la bonne réponse. Le Code du travail impose aux employeurs de mettre en place un régime de prévoyance pour leurs salariés cadres, incluant au minimum une garantie décès, financée par une cotisation patronale (1,50% de la tranche A du salaire).",
+                            "isCorrect": true
+                        },
+                        {
+                            "text": "Elle est la même pour les cadres et les non-cadres.",
+                            "rationale": "❌ C'est incorrect. La prévoyance cadre est spécifique aux cadres, la prévoyance non-cadre est facultative sauf accord collectif.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Elle n'est pas soumise à cotisations sociales.",
+                            "rationale": "❌ C'est incorrect. Les cotisations de prévoyance sont soumises à cotisations sociales.",
+                            "isCorrect": false
+                        }
+                    ]
+                },
+                {
+                    "question": "La rubrique 'Retraite' du bulletin simplifié distingue la 'Sécurité Sociale plafonnée' et la 'Sécurité Sociale déplafonnée'. Sur quelle base de calcul est calculée la cotisation 'Sécurité Sociale déplafonnée' ?",
+                    "hint": "Pensez à la partie du salaire prise en compte pour cette cotisation.",
+                    "answerOptions": [
+                        {
+                            "text": "Uniquement sur la tranche A du salaire.",
+                            "rationale": "❌ C'est incorrect. La tranche A est la base de la sécurité sociale plafonnée.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Sur la totalité du salaire brut.",
+                            "rationale": "✅ C'est la bonne réponse. La cotisation 'Sécurité Sociale déplafonnée' est calculée sur la totalité du salaire brut, sans limite de plafond, contrairement à la cotisation plafonnée qui ne s'applique que sur la partie du salaire inférieure ou égale au plafond de la sécurité sociale.",
+                            "isCorrect": true
+                        },
+                        {
+                            "text": "Sur la tranche B du salaire.",
+                            "rationale": "❌ C'est incorrect. La tranche B est une notion utilisée pour les retraites complémentaires, pas pour la sécurité sociale déplafonnée.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Sur le montant net imposable.",
+                            "rationale": "❌ C'est incorrect. Les cotisations sont calculées sur le salaire brut ou des assiettes spécifiques, pas sur le net imposable.",
+                            "isCorrect": false
+                        }
+                    ]
+                },
+                {
+                    "question": "Quelle est la principale différence entre la 'Réduction générale des cotisations sociales patronales' (ex-Fillon) et la 'Déduction TEPA' sur les heures supplémentaires ?",
+                    "hint": "L'une est une réduction générale sur les bas salaires, l'autre est spécifique aux heures supplémentaires.",
+                    "answerOptions": [
+                        {
+                            "text": "La Réduction générale s'applique sur les bas salaires, la Déduction TEPA est spécifique aux heures supplémentaires.",
+                            "rationale": "✅ C'est la bonne réponse. La réduction générale des cotisations patronales (ex-Fillon) est un allègement de charges sur les bas et moyens salaires. La déduction TEPA est une déduction forfaitaire spécifique aux heures supplémentaires effectuées par les salariés, visant à en réduire le coût pour l'employeur.",
+                            "isCorrect": true
+                        },
+                        {
+                            "text": "La Réduction générale est pour les entreprises de moins de 20 salariés, la Déduction TEPA pour les grandes entreprises.",
+                            "rationale": "❌ C'est incorrect. La réduction générale s'applique à toutes les entreprises, et la déduction TEPA dépend de l'effectif mais n'est pas exclusive aux grandes entreprises.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "La Réduction générale est un allègement fiscal, la Déduction TEPA est un allègement social.",
+                            "rationale": "❌ C'est incorrect. Les deux sont des allègements de cotisations sociales, bien qu'elles aient des impacts fiscaux indirects.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "La Réduction générale est obligatoire, la Déduction TEPA est facultative.",
+                            "rationale": "❌ C'est incorrect. Les deux sont des dispositifs légaux applicables sous certaines conditions.",
+                            "isCorrect": false
+                        }
+                    ]
+                },
+                {
+                    "question": "Quel est le rôle du 'Forfait social' parmi les 'Autres contributions dues par l'employeur' ?",
+                    "hint": "Il s'applique à certaines sommes exonérées de cotisations sociales mais qui ont un caractère de rémunération.",
+                    "answerOptions": [
+                        {
+                            "text": "Financer les allocations chômage.",
+                            "rationale": "❌ C'est incorrect. L'assurance chômage finance les allocations chômage, pas le forfait social.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Financer les prestations familiales.",
+                            "rationale": "❌ C'est incorrect. Les allocations familiales financent les prestations familiales, pas le forfait social.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "S'appliquer à certaines sommes exonérées de cotisations sociales mais à caractère de rémunération (ex: intéressement, participation).",
+                            "rationale": "✅ C'est la bonne réponse. Le forfait social est une contribution patronale qui s'applique à certaines sommes ou éléments de rémunération qui sont exonérés de cotisations sociales mais qui ont un caractère de rémunération, comme l'intéressement, la participation, ou certains abondements de l'employeur aux plans d'épargne salariale.",
+                            "isCorrect": true
+                        },
+                        {
+                            "text": "Financer la formation professionnelle continue.",
+                            "rationale": "❌ C'est incorrect. D'autres contributions spécifiques financent la formation professionnelle.",
+                            "isCorrect": false
+                        }
+                    ]
+                },
+                {
+                    "question": "Quelle est la finalité de la 'Contribution d'Équilibre Général (CEG)' et de la 'Contribution d'Équilibre Technique (CET)' dans la rubrique 'Retraite Complémentaire' ?",
+                    "hint": "Ces contributions visent à assurer la pérennité du régime de retraite complémentaire.",
+                    "answerOptions": [
+                        {
+                            "text": "Financer les pensions de retraite de base de la Sécurité Sociale.",
+                            "rationale": "❌ C'est incorrect. Les cotisations de sécurité sociale de base financent les pensions de retraite de base.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Assurer l'équilibre financier des régimes de retraite complémentaire (AGIRC-ARRCO).",
+                            "rationale": "✅ C'est la bonne réponse. La CEG et la CET sont des contributions spécifiques aux régimes de retraite complémentaire (AGIRC-ARRCO) qui visent à assurer l'équilibre financier et la pérennité de ces régimes, notamment en compensant les déséquilibres démographiques et financiers.",
+                            "isCorrect": true
+                        },
+                        {
+                            "text": "Financer les prestations d'assurance chômage.",
+                            "rationale": "❌ C'est incorrect. Les cotisations d'assurance chômage financent les allocations chômage.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Couvrir les risques d'accidents du travail et maladies professionnelles.",
+                            "rationale": "❌ C'est incorrect. La cotisation AT/MP couvre ces risques.",
+                            "isCorrect": false
+                        }
+                    ]
+                },
+                {
+                    "question": "En quoi consiste la 'réduction des cotisations sur les heures supplémentaires' mentionnée dans la rubrique 'Allègement de cotisations' ?",
+                    "hint": "Il s'agit d'un avantage pour le salarié sur ses cotisations sociales.",
+                    "answerOptions": [
+                        {
+                            "text": "Une déduction forfaitaire pour l'employeur.",
+                            "rationale": "❌ C'est incorrect. La déduction forfaitaire patronale est un autre allègement pour l'employeur, distinct de la réduction pour le salarié.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Une réduction des cotisations sociales salariales calculées sur les heures supplémentaires.",
+                            "rationale": "✅ C'est la bonne réponse. Les salariés bénéficient d'une réduction de leurs cotisations sociales salariales sur les heures supplémentaires effectuées, dans la limite d'un certain pourcentage du montant brut de ces heures. C'est une mesure qui vise à augmenter le net à payer des salariés.",
+                            "isCorrect": true
+                        },
+                        {
+                            "text": "Une exonération totale de cotisations sociales pour l'employeur et le salarié.",
+                            "rationale": "❌ C'est incorrect. L'exonération n'est pas totale et ne concerne pas toutes les cotisations.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Un remboursement des cotisations sociales payées par le salarié.",
+                            "rationale": "❌ C'est incorrect. Il s'agit d'une réduction directe des cotisations, pas d'un remboursement après paiement.",
+                            "isCorrect": false
+                        }
+                    ]
+                },
+                {
+                    "question": "Quel est l'impact de la 'participation patronale à la mutuelle' sur le calcul de la base CSG/CRDS et du forfait social ?",
+                    "hint": "Ces participations, bien que non soumises à certaines cotisations, sont réintégrées dans certaines assiettes.",
+                    "answerOptions": [
+                        {
+                            "text": "Elles sont totalement exonérées et n'ont aucun impact sur ces bases.",
+                            "rationale": "❌ C'est incorrect. Ces participations ont un impact sur la base CSG/CRDS et le forfait social.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Elles sont intégrées dans la base de calcul de la CSG/CRDS et du forfait social (si applicable).",
+                            "rationale": "✅ C'est la bonne réponse. La participation patronale à la mutuelle (et à la prévoyance) doit être intégrée dans la base de calcul de la CSG/CRDS et, le cas échéant, dans la base de calcul du forfait social à 8%.",
+                            "isCorrect": true
+                        },
+                        {
+                            "text": "Elles réduisent la base de calcul de la CSG/CRDS.",
+                            "rationale": "❌ C'est incorrect. Elles augmentent la base de calcul de la CSG/CRDS.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Elles sont uniquement soumises à l'impôt sur le revenu du salarié.",
+                            "rationale": "❌ C'est incorrect. Elles sont soumises à CSG/CRDS et au forfait social pour l'employeur.",
+                            "isCorrect": false
+                        }
+                    ]
+                },
+                {
+                    "question": "Quelle est la principale différence de traitement du Plafond de la Sécurité Sociale (PSS) pour un salarié à temps partiel par rapport à un temps plein ?",
+                    "hint": "Le PSS est proratisé en fonction du temps de travail.",
+                    "answerOptions": [
+                        {
+                            "text": "Le PSS est doublé pour les temps partiels.",
+                            "rationale": "❌ C'est incorrect. Le PSS n'est pas doublé pour les temps partiels.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Le PSS est proratisé en fonction de l'horaire mensuel moyen du salarié à temps partiel.",
+                            "rationale": "✅ C'est la bonne réponse. Pour un salarié à temps partiel, le Plafond de la Sécurité Sociale (PSS) est proratisé en fonction de son horaire mensuel moyen par rapport à l'horaire légal ou conventionnel du temps plein. Cela permet d'adapter le calcul des cotisations plafonnées à sa rémunération réelle.",
+                            "isCorrect": true
+                        },
+                        {
+                            "text": "Le PSS ne s'applique pas aux salariés à temps partiel.",
+                            "rationale": "❌ C'est incorrect. Le PSS s'applique, mais il est ajusté.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Le PSS est le même que pour un temps plein, mais la réduction générale est plus importante.",
+                            "rationale": "❌ C'est incorrect. Le PSS est proratisé pour les temps partiels.",
+                            "isCorrect": false
+                        }
+                    ]
+                },
+                {
+                    "question": "Un salarié cadre bénéficie d'une prévoyance obligatoire incluant une garantie décès. Sur quelle base de salaire cette cotisation patronale est-elle calculée, et quel est son taux minimum ?",
+                    "hint": "Cette cotisation est spécifique aux cadres et a une base et un taux réglementés.",
+                    "answerOptions": [
+                        {
+                            "text": "Sur le salaire brut total, au taux de 0,50%.",
+                            "rationale": "❌ C'est incorrect. La base et le taux sont différents.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Sur la Tranche A du salaire, au taux de 1,50%.",
+                            "rationale": "✅ C'est la bonne réponse. Pour les cadres, l'employeur a l'obligation de mettre en place une prévoyance incluant une garantie décès, financée par une cotisation patronale d'au moins 1,50% de la tranche A du salaire (partie du salaire inférieure ou égale au PSS).",
+                            "isCorrect": true
+                        },
+                        {
+                            "text": "Sur le PMSS, au taux de 0,75%.",
+                            "rationale": "❌ C'est incorrect. Le PMSS est souvent la base de la mutuelle, pas de la prévoyance décès cadre.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Sur le net imposable, au taux de 2%.",
+                            "rationale": "❌ C'est incorrect. Les cotisations sont calculées sur le brut ou des tranches spécifiques, pas sur le net imposable.",
+                            "isCorrect": false
+                        }
+                    ]
+                },
+                {
+                    "question": "Quelle est l'incidence d'une erreur de saisie des EVP (par exemple, un signe + au lieu d'un -) dans un logiciel de paie qui ne gère pas automatiquement les signes ?",
+                    "hint": "Une erreur de signe peut avoir un impact majeur sur les montants finaux.",
+                    "answerOptions": [
+                        {
+                            "text": "Le logiciel corrigera automatiquement l'erreur.",
+                            "rationale": "❌ C'est incorrect. Si le logiciel n'automatise pas les signes, il ne corrigera pas l'erreur de lui-même.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Le bulletin de paie sera erroné et le salaire net à payer sera incorrect.",
+                            "rationale": "✅ C'est la bonne réponse. Une erreur de signe dans la saisie des EVP peut entraîner des calculs de paie totalement incorrects, affectant le salaire brut, les cotisations, le net à payer et le net imposable. Cela nécessite une correction rapide pour éviter des préjudices au salarié ou à l'entreprise.",
+                            "isCorrect": true
+                        },
+                        {
+                            "text": "L'erreur sera détectée par l'URSSAF lors de la DSN.",
+                            "rationale": "❌ C'est incorrect. Bien que certaines incohérences puissent être détectées, une simple erreur de signe peut passer inaperçue dans les contrôles automatiques de la DSN si les montants restent plausibles.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Cela n'aura d'impact que sur les statistiques internes de l'entreprise.",
+                            "rationale": "❌ C'est incorrect. L'impact est direct sur la rémunération du salarié et les déclarations légales.",
+                            "isCorrect": false
+                        }
+                    ]
+                },
+                {
+                    "question": "Pourquoi est-il important pour le gestionnaire de paie de connaître la liste des rubriques de paie et leur positionnement sur le bulletin (brut, net) avant toute saisie d'EVP ?",
+                    "hint": "Cela concerne la cohérence et la conformité du bulletin.",
+                    "answerOptions": [
+                        {
+                            "text": "Pour pouvoir créer de nouvelles rubriques si nécessaire.",
+                            "rationale": "❌ C'est incorrect. Connaître les rubriques existantes ne signifie pas pouvoir en créer de nouvelles.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Pour choisir la rubrique cohérente avec la donnée à intégrer et éviter les erreurs de positionnement.",
+                            "rationale": "✅ C'est la bonne réponse. Connaître le positionnement (brut, net) et la nature de chaque rubrique est crucial pour saisir correctement les EVP et s'assurer qu'ils sont pris en compte dans les bons calculs (cotisations, impôt, net à payer). Cela évite des erreurs qui pourraient avoir des conséquences financières et légales.",
+                            "isCorrect": true
+                        },
+                        {
+                            "text": "Pour optimiser le temps de traitement de la paie.",
+                            "rationale": "❌ C'est incorrect. La connaissance des rubriques est plus liée à la qualité de la saisie qu'à la vitesse.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Pour justifier les montants auprès des managers.",
+                            "rationale": "❌ C'est incorrect. La justification auprès des managers est une conséquence, mais l'objectif principal est la justesse technique de la paie.",
+                            "isCorrect": false
+                        }
+                    ]
+                },
+                {
+                    "question": "Un salarié cadre à temps plein effectue 5 heures supplémentaires. Son salaire horaire est de 30 €. Quel est le montant brut à ajouter pour ces heures supplémentaires, sachant que l'entreprise applique le régime légal de majoration ?",
+                    "hint": "Les premières heures supplémentaires sont majorées à 25%.",
+                    "answerOptions": [
+                        {
+                            "text": "150,00 €",
+                            "rationale": "❌ C'est incorrect. 150 € correspondrait au montant sans majoration (5 heures * 30 €).",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "187,50 €",
+                            "rationale": "✅ C'est la bonne réponse. Les 5 heures supplémentaires sont majorées à 25%. Le calcul est : 5 heures * 30 €/heure * 1,25 = 187,50 €.",
+                            "isCorrect": true
+                        },
+                        {
+                            "text": "225,00 €",
+                            "rationale": "❌ C'est incorrect. Ce montant correspondrait à une majoration de 50%.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "250,00 €",
+                            "rationale": "❌ C'est incorrect. Ce montant est trop élevé.",
+                            "isCorrect": false
+                        }
+                    ]
+                },
+                {
+                    "question": "Un salarié demande un acompte de 50% de son salaire brut le 10 du mois. L'employeur est-il tenu d'accepter cette demande ?",
+                    "hint": "La loi encadre le montant maximal d'un acompte en fonction de la période travaillée.",
+                    "answerOptions": [
+                        {
+                            "text": "Oui, l'employeur doit toujours accepter les demandes d'acomptes.",
+                            "rationale": "❌ C'est incorrect. L'employeur n'est pas tenu d'accepter toutes les demandes d'acomptes, notamment si le montant est trop élevé par rapport au travail déjà effectué.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Non, car le montant de l'acompte ne peut excéder 1/3 du salaire net à payer après impôt acquis au 10 du mois.",
+                            "rationale": "✅ C'est la bonne réponse. L'employeur a l'obligation de répondre aux demandes d'acomptes, mais le montant ne peut excéder la rémunération acquise par le salarié au moment de la demande. Au 10 du mois, cela correspond généralement à 1/3 du salaire net à payer après impôt déjà acquis.",
+                            "isCorrect": true
+                        },
+                        {
+                            "text": "Non, car les acomptes sont interdits par la loi.",
+                            "rationale": "❌ C'est incorrect. Les acomptes sont autorisés et encadrés par la loi.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Oui, mais uniquement si un accord d'entreprise le permet.",
+                            "rationale": "❌ C'est incorrect. Le droit à l'acompte est légal, pas seulement conventionnel, mais il est encadré par des limites.",
+                            "isCorrect": false
+                        }
+                    ]
+                },
+                {
+                    "question": "Un salarié à temps partiel (24h/semaine) effectue 12 heures complémentaires sur un mois. Son contrat prévoit la limite légale de 1/3 de l'horaire hebdomadaire pour les heures complémentaires. Combien d'heures seront majorées à 10% et combien à 25% ?",
+                    "hint": "La majoration à 10% s'applique dans la limite du dixième de l'horaire contractuel.",
+                    "answerOptions": [
+                        {
+                            "text": "2,4 heures à 10% et 9,6 heures à 25%.",
+                            "rationale": "✅ C'est la bonne réponse. La limite de majoration à 10% est de 1/10e de l'horaire contractuel, soit 24h * 10% = 2,4 heures. Les heures complémentaires au-delà de 2,4h et jusqu'à la limite de 1/3 (24h/3 = 8h) sont majorées à 25%. Ici, 12 heures complémentaires dépassent la limite de 1/3. Cependant, la question porte sur la majoration des heures *dans le cadre légal*. Si on considère les heures jusqu'à la limite de 1/3, alors 2.4h sont à 10% et (8h - 2.4h) = 5.6h sont à 25%. Les heures au-delà de 8h (soit 4h ici) ne sont pas incluses dans les heures complémentaires légales et peuvent entraîner une requalification du contrat. Pour cette question, on se base sur les heures *majorées légalement*. Donc 2,4h à 10% et (12h - 2,4h) = 9,6h à 25% (si on considère que toutes les heures sont payées comme complémentaires). *Correction : La question est complexe car les 12h dépassent la limite légale des heures complémentaires (1/3 de 24h = 8h). Si on considère que toutes les heures sont payées comme complémentaires, alors 2.4h sont à 10% et le reste (12h - 2.4h = 9.6h) est à 25%. C'est la réponse la plus plausible dans un contexte de quiz où l'on cherche à appliquer les taux de majoration. La subtilité est que le dépassement de la limite de 1/3 peut entraîner une requalification du contrat plutôt qu'un paiement en heures complémentaires.*",
+                            "isCorrect": true
+                        },
+                        {
+                            "text": "8 heures à 10% et 4 heures à 25%.",
+                            "rationale": "❌ C'est incorrect. La majoration à 10% est limitée à 1/10e de l'horaire contractuel, pas à 1/3.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Toutes les 12 heures à 10%.",
+                            "rationale": "❌ C'est incorrect. Les heures complémentaires au-delà de 1/10e sont majorées à 25%.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Toutes les 12 heures à 25%.",
+                            "rationale": "❌ C'est incorrect. Les premières heures complémentaires sont majorées à 10%.",
+                            "isCorrect": false
+                        }
+                    ]
+                },
+                {
+                    "question": "Quel est l'objectif de la 'réduction des cotisations sociales salariales' sur les heures supplémentaires et complémentaires ?",
+                    "hint": "C'est une mesure pour augmenter le pouvoir d'achat du salarié.",
+                    "answerOptions": [
+                        {
+                            "text": "Diminuer le coût du travail pour l'employeur.",
+                            "rationale": "❌ C'est incorrect. C'est l'objectif de la déduction forfaitaire patronale, pas de la réduction des cotisations salariales.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Augmenter le salaire net du salarié.",
+                            "rationale": "✅ C'est la bonne réponse. La réduction des cotisations sociales salariales sur les heures supplémentaires et complémentaires vise à augmenter directement le pouvoir d'achat du salarié en réduisant les prélèvements sur ces heures travaillées.",
+                            "isCorrect": true
+                        },
+                        {
+                            "text": "Simplifier le calcul des cotisations.",
+                            "rationale": "❌ C'est incorrect. Cela complexifie plutôt le calcul des cotisations.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Financer le régime d'assurance chômage.",
+                            "rationale": "❌ C'est incorrect. D'autres cotisations spécifiques financent l'assurance chômage.",
+                            "isCorrect": false
+                        }
+                    ]
+                },
+                {
+                    "question": "Quelle est la principale différence entre la 'Contribution au dialogue social' et la cotisation 'APEC' ?",
+                    "hint": "L'une est générale, l'autre est spécifique aux cadres et à un organisme précis.",
+                    "answerOptions": [
+                        {
+                            "text": "La Contribution au dialogue social est pour les entreprises de plus de 50 salariés, l'APEC pour toutes les entreprises.",
+                            "rationale": "❌ C'est incorrect. La Contribution au dialogue social s'applique à toutes les entreprises, et l'APEC est spécifique aux cadres.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "La Contribution au dialogue social finance les organisations syndicales, l'APEC finance l'Association Pour l'Emploi des Cadres.",
+                            "rationale": "✅ C'est la bonne réponse. La Contribution au dialogue social finance le dialogue social au niveau national et interprofessionnel. La cotisation APEC est une cotisation spécifique aux cadres qui finance l'Association Pour l'Emploi des Cadres, un organisme d'aide à l'emploi et au développement professionnel des cadres.",
+                            "isCorrect": true
+                        },
+                        {
+                            "text": "La Contribution au dialogue social est à la charge de l'employeur, l'APEC à la charge du salarié.",
+                            "rationale": "❌ C'est incorrect. Les deux sont des contributions patronales, bien que l'APEC ait aussi une part salariale minime.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "La Contribution au dialogue social est facultative, l'APEC est obligatoire.",
+                            "rationale": "❌ C'est incorrect. Les deux sont obligatoires.",
+                            "isCorrect": false
+                        }
+                    ]
+                },
+                {
+                    "question": "Quelle est la particularité de la 'Contribution Solidarité Autonomie (CSA)' parmi les autres contributions dues par l'employeur ?",
+                    "hint": "Elle est liée à une journée de travail spécifique.",
+                    "answerOptions": [
+                        {
+                            "text": "Elle finance la formation professionnelle continue.",
+                            "rationale": "❌ C'est incorrect. D'autres contributions financent la formation professionnelle.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Elle finance le Fonds National d'Aide au Logement (FNAL).",
+                            "rationale": "❌ C'est incorrect. Le FNAL est une autre contribution.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Elle est liée au financement des actions en faveur de l'autonomie des personnes âgées et handicapées (Journée de Solidarité).",
+                            "rationale": "✅ C'est la bonne réponse. La Contribution Solidarité Autonomie (CSA) est une contribution patronale qui finance des actions en faveur de l'autonomie des personnes âgées ou handicapées, notamment dans le cadre de la Journée de Solidarité.",
+                            "isCorrect": true
+                        },
+                        {
+                            "text": "Elle est uniquement due par les entreprises de plus de 250 salariés.",
+                            "rationale": "❌ C'est incorrect. Elle est due par tous les employeurs du secteur privé.",
+                            "isCorrect": false
+                        }
+                    ]
+                },
+                {
+                    "question": "Quelle est la principale différence entre la 'CSG déductible' et la 'CSG/CRDS non déductible' de l'impôt sur le revenu sur le bulletin de paie ?",
+                    "hint": "L'une réduit le revenu imposable, l'autre non.",
+                    "answerOptions": [
+                        {
+                            "text": "La CSG déductible finance la Sécurité Sociale, la non déductible finance le chômage.",
+                            "rationale": "❌ C'est incorrect. Les deux financent la solidarité et la protection sociale, la distinction est fiscale.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "La CSG déductible réduit le revenu imposable, la non déductible n'a pas cet effet.",
+                            "rationale": "✅ C'est la bonne réponse. La 'CSG déductible' est une partie de la CSG qui est déductible du revenu brut global pour le calcul de l'impôt sur le revenu du salarié. La 'CSG non déductible' et la 'CRDS non déductible' ne sont pas déductibles du revenu imposable et sont donc imposées.",
+                            "isCorrect": true
+                        },
+                        {
+                            "text": "La CSG déductible est à la charge de l'employeur, la non déductible à la charge du salarié.",
+                            "rationale": "❌ C'est incorrect. Les deux sont des contributions salariales.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "La CSG déductible est calculée sur le net, la non déductible sur le brut.",
+                            "rationale": "❌ C'est incorrect. Les deux sont calculées sur une assiette proche du salaire brut, avec un abattement.",
+                            "isCorrect": false
+                        }
+                    ]
+                },
+                {
+                    "question": "Lors du calcul de la réduction générale des cotisations patronales (ex-Fillon), pourquoi le 'coefficient' de réduction est-il un élément clé ?",
+                    "hint": "Ce coefficient détermine le montant de la réduction.",
+                    "answerOptions": [
+                        {
+                            "text": "Il permet de déterminer l'éligibilité de l'entreprise à la réduction.",
+                            "rationale": "❌ C'est incorrect. L'éligibilité dépend de l'effectif et du niveau de salaire, pas du coefficient lui-même.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Il sert à calculer le montant de la réduction appliquée sur les cotisations patronales.",
+                            "rationale": "✅ C'est la bonne réponse. Le coefficient de la réduction générale est une formule mathématique qui, une fois calculée, est multipliée par la rémunération annuelle brute du salarié pour déterminer le montant total de la réduction des cotisations patronales applicable. C'est donc un élément déterminant du montant de l'allègement de charges.",
+                            "isCorrect": true
+                        },
+                        {
+                            "text": "Il indique le nombre d'heures supplémentaires exonérées.",
+                            "rationale": "❌ C'est incorrect. Le coefficient de la réduction générale n'est pas lié aux heures supplémentaires.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Il est utilisé pour proratiser le SMIC en cas de temps partiel.",
+                            "rationale": "❌ C'est incorrect. Le coefficient est spécifique à la réduction générale, pas à la proratisation du SMIC.",
+                            "isCorrect": false
+                        }
+                    ]
+                },
+                {
+                    "question": "Quel est l'impact de la 'Déduction TEPA' sur les heures supplémentaires et complémentaires pour le salarié ?",
+                    "hint": "C'est un allègement spécifique pour l'employeur.",
+                    "answerOptions": [
+                        {
+                            "text": "Elle augmente le salaire net imposable du salarié.",
+                            "rationale": "❌ C'est incorrect. La déduction TEPA est un allègement pour l'employeur, elle n'augmente pas le net imposable du salarié.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Elle réduit les cotisations sociales salariales sur ces heures.",
+                            "rationale": "❌ C'est incorrect. La réduction des cotisations salariales est un autre dispositif, distinct de la déduction TEPA qui est patronale.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Elle est une déduction forfaitaire patronale qui réduit le coût des heures pour l'employeur.",
+                            "rationale": "✅ C'est la bonne réponse. La Déduction TEPA (ou 'déduction forfaitaire patronale') est un allègement de charges sociales pour l'employeur, appliqué sur les heures supplémentaires et complémentaires. Elle vise à réduire le coût du travail pour l'entreprise.",
+                            "isCorrect": true
+                        },
+                        {
+                            "text": "Elle permet au salarié de ne pas déclarer ces heures aux impôts.",
+                            "rationale": "❌ C'est incorrect. L'exonération d'impôt pour le salarié est une autre mesure fiscale, distincte de la déduction TEPA.",
+                            "isCorrect": false
+                        }
+                    ]
+                },
+                {
+                    "question": "Pourquoi est-il crucial de vérifier le 'montant net social' sur le bulletin de paie avant de le transmettre au salarié ?",
+                    "hint": "Cette donnée est utilisée pour des démarches importantes du salarié.",
+                    "answerOptions": [
+                        {
+                            "text": "Pour s'assurer que le salarié peut le fournir comme justificatif d'identité.",
+                            "rationale": "❌ C'est incorrect. Le montant net social n'est pas un justificatif d'identité.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Pour garantir la conformité des déclarations de ressources du salarié aux organismes sociaux (CAF, MSA).",
+                            "rationale": "✅ C'est la bonne réponse. Le montant net social est une donnée clé pour le salarié, car c'est le montant qu'il doit déclarer aux organismes sociaux (comme la CAF ou la MSA) pour le calcul de ses droits à certaines prestations (RSA, prime d'activité). Une erreur ici peut avoir des conséquences directes sur les droits du salarié.",
+                            "isCorrect": true
+                        },
+                        {
+                            "text": "Pour calculer précisément le montant des cotisations patronales dues.",
+                            "rationale": "❌ C'est incorrect. Le montant net social est une donnée finale, pas une base de calcul des cotisations patronales.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Pour vérifier la bonne application du prélèvement à la source.",
+                            "rationale": "❌ C'est incorrect. Le prélèvement à la source est calculé sur le net imposable, pas directement sur le montant net social.",
+                            "isCorrect": false
+                        }
+                    ]
+                },
+                {
+                    "question": "En cas d'interruption collective du travail (ex: intempéries), les heures effectuées ultérieurement pour récupérer les heures perdues sont-elles considérées comme des heures supplémentaires ?",
+                    "hint": "Ces heures sont simplement un 'déplacement' du temps de travail normal.",
+                    "answerOptions": [
+                        {
+                            "text": "Oui, elles sont majorées à 25%.",
+                            "rationale": "❌ C'est incorrect. Ce sont des heures de récupération, pas des heures supplémentaires.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Oui, elles sont majorées à 50%.",
+                            "rationale": "❌ C'est incorrect. Ce sont des heures de récupération, pas des heures supplémentaires.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Non, elles sont considérées comme des heures normales simplement déplacées.",
+                            "rationale": "✅ C'est la bonne réponse. Les heures de récupération, effectuées suite à une interruption collective du travail due à des causes accidentelles ou intempéries, ne sont pas considérées comme des heures supplémentaires. Elles sont traitées comme des heures normales de travail, simplement reportées.",
+                            "isCorrect": true
+                        },
+                        {
+                            "text": "Uniquement si elles dépassent le contingent annuel.",
+                            "rationale": "❌ C'est incorrect. Le régime des heures de récupération est distinct de celui des heures supplémentaires et du contingent annuel.",
+                            "isCorrect": false
+                        }
+                    ]
+                },
+                {
+                    "question": "Quelle est la principale obligation de l'employeur concernant le bulletin de paie, selon le Code du travail ?",
+                    "hint": "Il s'agit d'une pièce justificative essentielle pour le salarié.",
+                    "answerOptions": [
+                        {
+                            "text": "Le conserver pendant 10 ans.",
+                            "rationale": "❌ C'est incorrect. La conservation est une obligation, mais la principale obligation est la remise au salarié.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Le remettre au salarié comme pièce justificative du paiement du salaire.",
+                            "rationale": "✅ C'est la bonne réponse. L'employeur a l'obligation légale de remettre un bulletin de paie à chaque salarié pour justifier le paiement du salaire, quelle que soit la forme du contrat ou le mode de paiement.",
+                            "isCorrect": true
+                        },
+                        {
+                            "text": "Le transmettre uniquement par voie électronique.",
+                            "rationale": "❌ C'est incorrect. La dématérialisation est le principe, mais le salarié peut s'y opposer et demander une version papier.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Obtenir l'accord préalable du salarié avant chaque remise.",
+                            "rationale": "❌ C'est incorrect. L'accord préalable n'est plus nécessaire pour la dématérialisation depuis 2017, sauf opposition du salarié.",
+                            "isCorrect": false
+                        }
+                    ]
+                },
+                {
+                    "question": "Depuis quand le bulletin de paie 'simplifié' ou 'clarifié' est-il obligatoire pour tous les employeurs en France ?",
+                    "hint": "Il y a eu une généralisation progressive de ce nouveau format.",
+                    "answerOptions": [
+                        {
+                            "text": "Depuis le 1er mars 2016.",
+                            "rationale": "❌ C'est incorrect. Cette date marque l'introduction de la possibilité de remettre le bulletin simplifié, mais pas son obligation pour tous.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Depuis le 1er janvier 2017.",
+                            "rationale": "❌ C'est incorrect. Cette date marque l'obligation pour les entreprises d'au moins 300 salariés, pas pour tous.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Depuis le 1er janvier 2018.",
+                            "rationale": "✅ C'est la bonne réponse. Le bulletin de paie simplifié est devenu obligatoire pour tous les employeurs en France à partir du 1er janvier 2018.",
+                            "isCorrect": true
+                        },
+                        {
+                            "text": "Depuis le 1er juillet 2023.",
+                            "rationale": "❌ C'est incorrect. Cette date marque l'obligation d'afficher le montant net social, pas la généralisation du bulletin simplifié.",
+                            "isCorrect": false
+                        }
+                    ]
+                },
+                {
+                    "question": "Quelle est la sanction principale pour un employeur qui ne respecte pas les dispositions relatives au bulletin de paie ?",
+                    "hint": "Il s'agit d'une amende prévue par le Code du travail.",
+                    "answerOptions": [
+                        {
+                            "text": "Une peine d'emprisonnement.",
+                            "rationale": "❌ C'est incorrect. La peine d'emprisonnement est associée à des délits plus graves, comme le travail dissimulé, mais pas directement à la simple méconnaissance des dispositions sur le bulletin de paie.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Une amende prévue pour les contraventions de la troisième classe (450 €).",
+                            "rationale": "✅ C'est la bonne réponse. Le fait de ne pas respecter les dispositions relatives au bulletin de paie est puni de l'amende prévue pour les contraventions de la troisième classe, soit 450 €.",
+                            "isCorrect": true
+                        },
+                        {
+                            "text": "Des dommages et intérêts au salarié uniquement.",
+                            "rationale": "❌ C'est incorrect. Le salarié peut obtenir des dommages et intérêts en cas de préjudice, mais la sanction principale pour l'employeur est une amende.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "La nullité du contrat de travail.",
+                            "rationale": "❌ C'est incorrect. Le non-respect des dispositions sur le bulletin de paie n'entraîne pas la nullité du contrat de travail.",
+                            "isCorrect": false
+                        }
+                    ]
+                },
+                {
+                    "question": "Quel est l'objectif principal de l'introduction du 'montant net social' sur le bulletin de paie depuis le 1er juillet 2023 ?",
+                    "hint": "Cette mention vise à faciliter les démarches pour certaines prestations sociales.",
+                    "answerOptions": [
+                        {
+                            "text": "Simplifier le calcul du revenu imposable du salarié.",
+                            "rationale": "❌ C'est incorrect. Le montant net social est distinct du revenu imposable, bien que les deux figurent sur le bulletin.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Informer les salariés sur le coût total de leur emploi pour l'employeur.",
+                            "rationale": "❌ C'est incorrect. Le coût employeur est une autre information présente, mais pas l'objectif du net social.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Faciliter la déclaration des ressources aux organismes sociaux (CAF, MSA) pour le calcul des prestations.",
+                            "rationale": "✅ C'est la bonne réponse. Le montant net social est une donnée clé pour le salarié, car c'est le montant qu'il doit déclarer aux organismes sociaux (comme la CAF ou la MSA) pour le calcul de ses droits à certaines prestations (RSA, prime d'activité). Une erreur ici peut avoir des conséquences directes sur les droits du salarié.",
+                            "isCorrect": true
+                        },
+                        {
+                            "text": "Permettre au gestionnaire de paie de mieux contrôler les cotisations.",
+                            "rationale": "❌ C'est incorrect. Le montant net social est une information destinée au salarié, pas un outil de contrôle pour le gestionnaire de paie.",
+                            "isCorrect": false
+                        }
+                    ]
+                },
+                {
+                    "question": "Parmi les éléments suivants, lequel est une mention OBLIGATOIRE qui doit figurer sur un bulletin de paie ?",
+                    "hint": "Pensez aux informations essentielles pour identifier l'emploi et la rémunération.",
+                    "answerOptions": [
+                        {
+                            "text": "L'adresse personnelle du salarié.",
+                            "rationale": "❌ C'est incorrect. L'adresse du salarié est une mention facultative sur le bulletin de paie.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Le montant des primes exceptionnelles non soumises à cotisations.",
+                            "rationale": "❌ C'est incorrect. Le montant des sommes non soumises à cotisations doit figurer, mais la question porte sur une mention obligatoire générale.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "L'intitulé de l'emploi et la position dans la classification selon la convention collective.",
+                            "rationale": "✅ C'est la bonne réponse. Le bulletin de paie doit obligatoirement inclure l'intitulé de l'emploi, la position du salarié dans la classification de la convention collective (niveau, coefficient, indice).",
+                            "isCorrect": true
+                        },
+                        {
+                            "text": "La date de naissance du salarié.",
+                            "rationale": "❌ C'est incorrect. La date de naissance du salarié n'est pas une mention obligatoire sur le bulletin de paie.",
+                            "isCorrect": false
+                        }
+                    ]
+                },
+                {
+                    "question": "Quelle est la durée minimale de conservation des bulletins de paie par l'employeur selon le Code du travail et le Code de commerce ?",
+                    "hint": "Deux durées différentes sont mentionnées pour des raisons distinctes.",
+                    "answerOptions": [
+                        {
+                            "text": "5 ans (Code du travail) et 10 ans (Code de commerce).",
+                            "rationale": "✅ C'est la bonne réponse. L'employeur est tenu de conserver les bulletins de paie pendant une durée minimale de 5 ans selon le Code du travail, et les documents comptables (y compris les bulletins de paie) pendant au moins 10 ans selon le Code de commerce.",
+                            "isCorrect": true
+                        },
+                        {
+                            "text": "5 ans pour les versions papier et 50 ans pour les versions électroniques.",
+                            "rationale": "❌ C'est incorrect. La durée de 50 ans ou jusqu'à 75 ans du salarié concerne la disponibilité des bulletins électroniques pour le salarié, pas la conservation par l'employeur.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "10 ans pour tous les bulletins, quel que soit le support.",
+                            "rationale": "❌ C'est incorrect. Le Code du travail mentionne 5 ans, et le Code de commerce 10 ans pour les documents comptables.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "À vie, car ils sont essentiels pour les droits à la retraite.",
+                            "rationale": "❌ C'est incorrect. La recommandation de conserver à vie est pour le salarié, pas une obligation de l'employeur.",
+                            "isCorrect": false
+                        }
+                    ]
+                },
+                {
+                    "question": "Vrai ou Faux : L'employeur a l'obligation de remettre un duplicata au salarié si celui-ci a perdu son bulletin de paie.",
+                    "hint": "Pensez à la responsabilité de conservation du salarié.",
+                    "answerOptions": [
+                        {
+                            "text": "Vrai",
+                            "rationale": "❌ C'est incorrect. L'employeur n'est pas tenu de remettre un duplicata. Le salarié est responsable de la conservation de ses bulletins.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Faux",
+                            "rationale": "✅ C'est la bonne réponse. L'employeur n'est pas dans l'obligation de remettre un duplicata au salarié si celui-ci a perdu son bulletin de salaire. Il est fortement recommandé aux salariés de conserver leurs bulletins à vie.",
+                            "isCorrect": true
+                        }
+                    ]
+                },
+                {
+                    "question": "Lors de la méthodologie de réalisation d'un bulletin de paie, quelle est la première étape essentielle concernant les données de l'entreprise ?",
+                    "hint": "Il s'agit de paramétrer les éléments généraux qui impactent tous les bulletins.",
+                    "answerOptions": [
+                        {
+                            "text": "Reporter les informations essentielles du salarié dans le bulletin.",
+                            "rationale": "❌ C'est incorrect. Les informations du salarié sont une étape ultérieure. La première étape concerne l'entreprise dans sa globalité.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Vérifier le montant du salaire brut de chaque salarié.",
+                            "rationale": "❌ C'est incorrect. La vérification du salaire brut est une étape de contrôle après la saisie des variables.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Extraire toutes les données générales de l'entreprise pour les reporter sur les paramétrages de la paie.",
+                            "rationale": "✅ C'est la bonne réponse. La première étape de la méthodologie de paie est de collecter et paramétrer toutes les données générales de l'entreprise (taux d'accident du travail, effectif, versement mobilité, mutuelle, prévoyance, etc.) qui auront un impact sur tous les bulletins de paie.",
+                            "isCorrect": true
+                        },
+                        {
+                            "text": "Calculer la base CSG/CRDS pour tous les salariés.",
+                            "rationale": "❌ C'est incorrect. Le calcul de la base CSG/CRDS est une vérification spécifique après avoir paramétré les données générales de l'entreprise.",
+                            "isCorrect": false
+                        }
+                    ]
+                },
+                {
+                    "question": "Quel est l'objectif principal du regroupement des cotisations sur le bulletin de paie simplifié ?",
+                    "hint": "Cette simplification vise à rendre le document plus accessible pour le salarié.",
+                    "answerOptions": [
+                        {
+                            "text": "Réduire le nombre de lignes sur le bulletin pour économiser du papier.",
+                            "rationale": "❌ C'est incorrect. Bien que ce soit une conséquence, l'objectif principal est la compréhension, pas l'économie de papier.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Faciliter le contrôle des calculs de paie par le gestionnaire.",
+                            "rationale": "❌ C'est incorrect. Le bulletin simplifié n'est pas conçu pour le contrôle détaillé des calculs par le gestionnaire, qui utilise plutôt le bulletin détaillé.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Rendre plus compréhensible le système français de protection sociale pour le salarié.",
+                            "rationale": "✅ C'est la bonne réponse. Le bulletin de paie simplifié a pour objectif de rendre le système français de protection sociale plus transparent et compréhensible pour le salarié, en regroupant les cotisations par risque (santé, retraite, chômage, etc.).",
+                            "isCorrect": true
+                        },
+                        {
+                            "text": "Cacher certaines cotisations au salarié.",
+                            "rationale": "❌ C'est incorrect. L'objectif est la transparence et la simplification, pas la dissimulation.",
+                            "isCorrect": false
+                        }
+                    ]
+                },
+                {
+                    "question": "Quelle est la particularité de la cotisation 'Prévoyance Cadre' mentionnée dans la rubrique 'Santé' du bulletin simplifié ?",
+                    "hint": "Elle est obligatoire et financée par l'employeur pour une catégorie spécifique de salariés.",
+                    "answerOptions": [
+                        {
+                            "text": "Elle est facultative et à la charge exclusive du salarié.",
+                            "rationale": "❌ C'est incorrect. La prévoyance cadre est obligatoire pour les employeurs et a une part patronale.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Elle est obligatoire pour les salariés cadres et inclut une garantie décès financée par l'employeur.",
+                            "rationale": "✅ C'est la bonne réponse. La prévoyance cadre est une obligation pour l'employeur concernant les salariés cadres, et elle doit inclure au minimum une garantie décès, financée par une cotisation patronale spécifique.",
+                            "isCorrect": true
+                        },
+                        {
+                            "text": "Elle est la même pour les cadres et les non-cadres.",
+                            "rationale": "❌ C'est incorrect. La prévoyance cadre est spécifique aux cadres, la prévoyance non-cadre est facultative sauf accord collectif.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Elle n'est pas soumise à cotisations sociales.",
+                            "rationale": "❌ C'est incorrect. Les cotisations de prévoyance sont soumises à cotisations sociales.",
+                            "isCorrect": false
+                        }
+                    ]
+                },
+                {
+                    "question": "La rubrique 'Retraite' du bulletin simplifié distingue la 'Sécurité Sociale plafonnée' et la 'Sécurité Sociale déplafonnée'. Sur quelle base de calcul est calculée la cotisation 'Sécurité Sociale déplafonnée' ?",
+                    "hint": "Pensez à la partie du salaire prise en compte pour cette cotisation.",
+                    "answerOptions": [
+                        {
+                            "text": "Uniquement sur la tranche A du salaire.",
+                            "rationale": "❌ C'est incorrect. La tranche A est la base de la sécurité sociale plafonnée.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Sur la totalité du salaire brut.",
+                            "rationale": "✅ C'est la bonne réponse. La cotisation de Sécurité Sociale déplafonnée est calculée sur l'intégralité du salaire brut du salarié, sans application d'un plafond.",
+                            "isCorrect": true
+                        },
+                        {
+                            "text": "Sur la tranche B du salaire.",
+                            "rationale": "❌ C'est incorrect. La tranche B est une notion utilisée pour les retraites complémentaires, pas pour la sécurité sociale déplafonnée.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Sur le montant net imposable.",
+                            "rationale": "❌ C'est incorrect. Les cotisations sont calculées sur le salaire brut ou des assiettes spécifiques, pas sur le net imposable.",
+                            "isCorrect": false
+                        }
+                    ]
+                },
+                {
+                    "question": "Quelle est la principale différence entre la 'Réduction générale des cotisations sociales patronales' (ex-Fillon) et la 'Déduction TEPA' sur les heures supplémentaires ?",
+                    "hint": "L'une est une réduction générale sur les bas salaires, l'autre est spécifique aux heures supplémentaires.",
+                    "answerOptions": [
+                        {
+                            "text": "La Réduction générale s'applique sur les bas salaires, la Déduction TEPA est spécifique aux heures supplémentaires.",
+                            "rationale": "✅ C'est la bonne réponse. La réduction générale est un allègement de charges patronales sur les bas et moyens salaires, tandis que la Déduction TEPA (ou déduction forfaitaire patronale) est un allègement spécifique lié aux heures supplémentaires et complémentaires.",
+                            "isCorrect": true
+                        },
+                        {
+                            "text": "La Réduction générale est pour les entreprises de moins de 20 salariés, la Déduction TEPA pour les grandes entreprises.",
+                            "rationale": "❌ C'est incorrect. La réduction générale s'applique à toutes les entreprises, et la déduction TEPA dépend de l'effectif mais n'est pas exclusive aux grandes entreprises.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "La Réduction générale est un allègement fiscal, la Déduction TEPA est un allègement social.",
+                            "rationale": "❌ C'est incorrect. Les deux sont des allègements de cotisations sociales, bien qu'elles aient des impacts fiscaux indirects.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "La Réduction générale est obligatoire, la Déduction TEPA est facultative.",
+                            "rationale": "❌ C'est incorrect. Les deux sont des dispositifs légaux applicables sous certaines conditions.",
+                            "isCorrect": false
+                        }
+                    ]
+                },
+                {
+                    "question": "Quel est le rôle du 'Forfait social' parmi les 'Autres contributions dues par l'employeur' ?",
+                    "hint": "Il s'applique à certaines sommes exonérées de cotisations sociales mais qui ont un caractère de rémunération.",
+                    "answerOptions": [
+                        {
+                            "text": "Financer les allocations chômage.",
+                            "rationale": "❌ C'est incorrect. L'assurance chômage finance les allocations chômage, pas le forfait social.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Financer les prestations familiales.",
+                            "rationale": "❌ C'est incorrect. Les allocations familiales financent les prestations familiales, pas le forfait social.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "S'appliquer à certaines sommes exonérées de cotisations sociales mais à caractère de rémunération (ex: intéressement, participation).",
+                            "rationale": "✅ C'est la bonne réponse. Le forfait social est une contribution patronale qui s'applique à certaines sommes (comme l'intéressement, la participation, ou certains abondements de l'employeur aux plans d'épargne salariale) qui, bien qu'exonérées de cotisations sociales, conservent un caractère de rémunération.",
+                            "isCorrect": true
+                        },
+                        {
+                            "text": "Financer la formation professionnelle continue.",
+                            "rationale": "❌ C'est incorrect. D'autres contributions spécifiques financent la formation professionnelle.",
+                            "isCorrect": false
+                        }
+                    ]
+                },
+                {
+                    "question": "Quelle est la finalité de la 'Contribution d'Équilibre Général (CEG)' et de la 'Contribution d'Équilibre Technique (CET)' dans la rubrique 'Retraite Complémentaire' ?",
+                    "hint": "Ces contributions visent à assurer la pérennité du régime de retraite complémentaire.",
+                    "answerOptions": [
+                        {
+                            "text": "Financer les pensions de retraite de base de la Sécurité Sociale.",
+                            "rationale": "❌ C'est incorrect. Les cotisations de sécurité sociale de base financent les pensions de retraite de base.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Assurer l'équilibre financier des régimes de retraite complémentaire (AGIRC-ARRCO).",
+                            "rationale": "✅ C'est la bonne réponse. La CEG et la CET sont des contributions qui visent à assurer l'équilibre financier et la pérennité des régimes de retraite complémentaire (AGIRC-ARRCO), en compensant les déséquilibres démographiques et financiers.",
+                            "isCorrect": true
+                        },
+                        {
+                            "text": "Financer les prestations d'assurance chômage.",
+                            "rationale": "❌ C'est incorrect. Les cotisations d'assurance chômage financent les allocations chômage.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Couvrir les risques d'accidents du travail et maladies professionnelles.",
+                            "rationale": "❌ C'est incorrect. La cotisation AT/MP couvre ces risques.",
+                            "isCorrect": false
+                        }
+                    ]
+                },
+                {
+                    "question": "En quoi consiste la 'réduction des cotisations sur les heures supplémentaires' mentionnée dans la rubrique 'Allègement de cotisations' ?",
+                    "hint": "Il s'agit d'un avantage pour le salarié sur ses cotisations sociales.",
+                    "answerOptions": [
+                        {
+                            "text": "Une déduction forfaitaire pour l'employeur.",
+                            "rationale": "❌ C'est incorrect. La déduction forfaitaire patronale est un autre allègement pour l'employeur, distinct de la réduction pour le salarié.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Une réduction des cotisations sociales salariales calculées sur les heures supplémentaires.",
+                            "rationale": "✅ C'est la bonne réponse. Les salariés bénéficient d'une réduction de leurs cotisations sociales salariales sur les heures supplémentaires et complémentaires effectuées. Cette mesure vise à augmenter le net à payer du salarié en réduisant les prélèvements sur ces heures.",
+                            "isCorrect": true
+                        },
+                        {
+                            "text": "Une exonération totale de cotisations sociales pour l'employeur et le salarié.",
+                            "rationale": "❌ C'est incorrect. L'exonération n'est pas totale et ne concerne pas toutes les cotisations.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Un remboursement des cotisations sociales payées par le salarié.",
+                            "rationale": "❌ C'est incorrect. Il s'agit d'une réduction directe des cotisations, pas d'un remboursement après paiement.",
+                            "isCorrect": false
+                        }
+                    ]
+                },
+                {
+                    "question": "Quel est l'impact de la 'participation patronale à la mutuelle' sur le calcul de la base CSG/CRDS et du forfait social ?",
+                    "hint": "Ces participations, bien que non soumises à certaines cotisations, sont réintégrées dans certaines assiettes.",
+                    "answerOptions": [
+                        {
+                            "text": "Elles sont totalement exonérées et n'ont aucun impact sur ces bases.",
+                            "rationale": "❌ C'est incorrect. Ces participations ont un impact sur la base CSG/CRDS et le forfait social.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Elles sont intégrées dans la base de calcul de la CSG/CRDS et du forfait social (si applicable).",
+                            "rationale": "✅ C'est la bonne réponse. La participation patronale à la mutuelle (et à la prévoyance) doit être réintégrée dans l'assiette de la CSG/CRDS et, si l'entreprise est concernée, dans l'assiette du forfait social.",
+                            "isCorrect": true
+                        },
+                        {
+                            "text": "Elles réduisent la base de calcul de la CSG/CRDS.",
+                            "rationale": "❌ C'est incorrect. Elles augmentent la base de calcul de la CSG/CRDS.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Elles sont uniquement soumises à l'impôt sur le revenu du salarié.",
+                            "rationale": "❌ C'est incorrect. Elles sont soumises à CSG/CRDS et au forfait social pour l'employeur.",
+                            "isCorrect": false
+                        }
+                    ]
+                },
+                {
+                    "question": "Quelle est la principale différence de traitement du Plafond de la Sécurité Sociale (PSS) pour un salarié à temps partiel par rapport à un temps plein ?",
+                    "hint": "Le PSS est proratisé en fonction du temps de travail.",
+                    "answerOptions": [
+                        {
+                            "text": "Le PSS est doublé pour les temps partiels.",
+                            "rationale": "❌ C'est incorrect. Le PSS n'est pas doublé pour les temps partiels.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Le PSS est proratisé en fonction de l'horaire mensuel moyen du salarié à temps partiel.",
+                            "rationale": "✅ C'est la bonne réponse. Pour les salariés à temps partiel, le Plafond de la Sécurité Sociale (PSS) est proratisé en fonction de leur durée de travail par rapport à la durée légale ou conventionnelle du temps plein. Cela permet d'adapter le calcul des cotisations plafonnées à leur rémunération réelle.",
+                            "isCorrect": true
+                        },
+                        {
+                            "text": "Le PSS ne s'applique pas aux salariés à temps partiel.",
+                            "rationale": "❌ C'est incorrect. Le PSS s'applique, mais il est ajusté.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Le PSS est le même que pour un temps plein, mais la réduction générale est plus importante.",
+                            "rationale": "❌ C'est incorrect. Le PSS est proratisé pour les temps partiels.",
+                            "isCorrect": false
+                        }
+                    ]
+                },
+                {
+                    "question": "Un salarié cadre bénéficie d'une prévoyance obligatoire incluant une garantie décès. Sur quelle base de salaire cette cotisation patronale est-elle calculée, et quel est son taux minimum ?",
+                    "hint": "Cette cotisation est spécifique aux cadres et a une base et un taux réglementés.",
+                    "answerOptions": [
+                        {
+                            "text": "Sur le salaire brut total, au taux de 0,50%.",
+                            "rationale": "❌ C'est incorrect. La base et le taux sont différents.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Sur la Tranche A du salaire, au taux de 1,50%.",
+                            "rationale": "✅ C'est la bonne réponse. La cotisation patronale de prévoyance obligatoire pour les cadres (incluant une garantie décès) est calculée sur la Tranche A du salaire, avec un taux minimum de 1,50%.",
+                            "isCorrect": true
+                        },
+                        {
+                            "text": "Sur le PMSS, au taux de 0,75%.",
+                            "rationale": "❌ C'est incorrect. Le PMSS est souvent la base de la mutuelle, pas de la prévoyance décès cadre.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Sur le net imposable, au taux de 2%.",
+                            "rationale": "❌ C'est incorrect. Les cotisations sont calculées sur le brut ou des tranches spécifiques, pas sur le net imposable.",
+                            "isCorrect": false
+                        }
+                    ]
+                },
+                {
+                    "question": "Quelle est l'incidence d'une erreur de saisie des EVP (par exemple, un signe + au lieu d'un -) dans un logiciel de paie qui ne gère pas automatiquement les signes ?",
+                    "hint": "Une erreur de signe peut avoir un impact majeur sur les montants finaux.",
+                    "answerOptions": [
+                        {
+                            "text": "Le logiciel corrigera automatiquement l'erreur.",
+                            "rationale": "❌ C'est incorrect. Si le logiciel n'automatise pas les signes, il ne corrigera pas l'erreur de lui-même.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Le bulletin de paie sera erroné et le salaire net à payer sera incorrect.",
+                            "rationale": "✅ C'est la bonne réponse. Une erreur de signe dans la saisie des EVP peut entraîner des calculs de paie totalement incorrects, affectant le salaire brut, les cotisations, le net à payer et le net imposable. Cela nécessite une correction rapide pour éviter des préjudices au salarié ou à l'entreprise.",
+                            "isCorrect": true
+                        },
+                        {
+                            "text": "L'erreur sera détectée par l'URSSAF lors de la DSN.",
+                            "rationale": "❌ C'est incorrect. Bien que certaines incohérences puissent être détectées, une simple erreur de signe peut passer inaperçue dans les contrôles automatiques de la DSN si les montants restent plausibles.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Cela n'aura d'impact que sur les statistiques internes de l'entreprise.",
+                            "rationale": "❌ C'est incorrect. L'impact est direct sur la rémunération du salarié et les déclarations légales.",
+                            "isCorrect": false
+                        }
+                    ]
+                },
+                {
+                    "question": "Pourquoi est-il important pour le gestionnaire de paie de connaître la liste des rubriques de paie et leur positionnement sur le bulletin (brut, net) avant toute saisie d'EVP ?",
+                    "hint": "Cela concerne la cohérence et la conformité du bulletin.",
+                    "answerOptions": [
+                        {
+                            "text": "Pour pouvoir créer de nouvelles rubriques si nécessaire.",
+                            "rationale": "❌ C'est incorrect. Connaître les rubriques existantes ne signifie pas pouvoir en créer de nouvelles.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Pour choisir la rubrique cohérente avec la donnée à intégrer et éviter les erreurs de positionnement.",
+                            "rationale": "✅ C'est la bonne réponse. Connaître le positionnement (brut, net) et la nature de chaque rubrique est crucial pour saisir correctement les EVP et s'assurer qu'ils sont pris en compte dans les bons calculs (cotisations, impôt, net à payer). Cela évite des erreurs qui pourraient avoir des conséquences financières et légales.",
+                            "isCorrect": true
+                        },
+                        {
+                            "text": "Pour optimiser le temps de traitement de la paie.",
+                            "rationale": "❌ C'est incorrect. La connaissance des rubriques est plus liée à la qualité de la saisie qu'à la vitesse.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Pour justifier les montants auprès des managers.",
+                            "rationale": "❌ C'est incorrect. La justification auprès des managers est une conséquence, mais l'objectif principal est la justesse technique de la paie.",
+                            "isCorrect": false
+                        }
+                    ]
+                },
+                {
+                    "question": "Un salarié cadre à temps plein effectue 5 heures supplémentaires. Son salaire horaire est de 30 €. Quel est le montant brut à ajouter pour ces heures supplémentaires, sachant que l'entreprise applique le régime légal de majoration ?",
+                    "hint": "Les premières heures supplémentaires sont majorées à 25%.",
+                    "answerOptions": [
+                        {
+                            "text": "150,00 €",
+                            "rationale": "❌ C'est incorrect. 150 € correspondrait au montant sans majoration (5 heures * 30 €).",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "187,50 €",
+                            "rationale": "✅ C'est la bonne réponse. Les 5 heures supplémentaires sont majorées à 25%. Le calcul est : 5 heures * 30 €/heure * 1,25 = 187,50 €.",
+                            "isCorrect": true
+                        },
+                        {
+                            "text": "225,00 €",
+                            "rationale": "❌ C'est incorrect. Ce montant correspondrait à une majoration de 50%.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "250,00 €",
+                            "rationale": "❌ C'est incorrect. Ce montant est trop élevé.",
+                            "isCorrect": false
+                        }
+                    ]
+                },
+                {
+                    "question": "Un salarié demande un acompte de 50% de son salaire brut le 10 du mois. L'employeur est-il tenu d'accepter cette demande ?",
+                    "hint": "La loi encadre le montant maximal d'un acompte en fonction de la période travaillée.",
+                    "answerOptions": [
+                        {
+                            "text": "Oui, l'employeur doit toujours accepter les demandes d'acomptes.",
+                            "rationale": "❌ C'est incorrect. L'employeur n'est pas tenu d'accepter toutes les demandes d'acomptes, notamment si le montant est trop élevé par rapport au travail déjà effectué.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Non, car le montant de l'acompte ne peut excéder 1/3 du salaire net à payer après impôt acquis au 10 du mois.",
+                            "rationale": "✅ C'est la bonne réponse. L'employeur a l'obligation de verser un acompte correspondant au travail déjà effectué, mais il peut refuser une demande qui dépasse ce montant légal. Au 10 du mois, cela représente généralement un tiers du salaire net à payer après impôt.",
+                            "isCorrect": true
+                        },
+                        {
+                            "text": "Non, car les acomptes sont interdits par la loi.",
+                            "rationale": "❌ C'est incorrect. Les acomptes sont autorisés et encadrés par la loi.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Oui, mais uniquement si un accord d'entreprise le permet.",
+                            "rationale": "❌ C'est incorrect. Le droit à l'acompte est légal, pas seulement conventionnel, mais il est encadré par des limites.",
+                            "isCorrect": false
+                        }
+                    ]
+                },
+                {
+                    "question": "Un salarié à temps partiel (24h/semaine) effectue 12 heures complémentaires sur un mois. Son contrat prévoit la limite légale de 1/3 de l'horaire hebdomadaire pour les heures complémentaires. Combien d'heures seront majorées à 10% et combien à 25% ?",
+                    "hint": "La majoration à 10% s'applique dans la limite du dixième de l'horaire contractuel. Les heures au-delà de la limite légale de 1/3 ne sont pas considérées comme des heures complémentaires.",
+                    "answerOptions": [
+                        {
+                            "text": "2,4 heures à 10% et 5,6 heures à 25%, les 4 heures restantes peuvent entraîner une requalification.",
+                            "rationale": "✅ C'est la bonne réponse. La limite de majoration à 10% est de 1/10e de l'horaire contractuel, soit 24h * 10% = 2,4 heures. La limite légale des heures complémentaires est de 1/3 de l'horaire contractuel, soit 24h / 3 = 8 heures. Donc, sur les 12 heures effectuées : 2,4 heures sont majorées à 10%. Les heures de 2,4h à 8h (soit 5,6 heures) sont majorées à 25%. Les 4 heures restantes (12h - 8h) dépassent la limite légale des heures complémentaires et peuvent entraîner une requalification du contrat à temps plein.",
+                            "isCorrect": true
+                        },
+                        {
+                            "text": "8 heures à 10% et 4 heures à 25%.",
+                            "rationale": "❌ C'est incorrect. La majoration à 10% est limitée à 1/10e de l'horaire contractuel, pas à 1/3.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Toutes les 12 heures à 10%.",
+                            "rationale": "❌ C'est incorrect. Les heures complémentaires au-delà de 1/10e sont majorées à 25%.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Toutes les 12 heures à 25%.",
+                            "rationale": "❌ C'est incorrect. Les premières heures complémentaires sont majorées à 10%.",
+                            "isCorrect": false
+                        }
+                    ]
+                },
+                {
+                    "question": "Quel est l'objectif de la 'réduction des cotisations sociales salariales' sur les heures supplémentaires et complémentaires ?",
+                    "hint": "C'est une mesure pour augmenter le pouvoir d'achat du salarié.",
+                    "answerOptions": [
+                        {
+                            "text": "Diminuer le coût du travail pour l'employeur.",
+                            "rationale": "❌ C'est incorrect. C'est l'objectif de la déduction forfaitaire patronale, pas de la réduction des cotisations salariales.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Augmenter le salaire net du salarié.",
+                            "rationale": "✅ C'est la bonne réponse. La réduction des cotisations sociales salariales sur les heures supplémentaires et complémentaires vise à augmenter directement le pouvoir d'achat du salarié en réduisant les prélèvements sur ces heures travaillées.",
+                            "isCorrect": true
+                        },
+                        {
+                            "text": "Simplifier le calcul des cotisations.",
+                            "rationale": "❌ C'est incorrect. Cela complexifie plutôt le calcul des cotisations.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Financer le régime d'assurance chômage.",
+                            "rationale": "❌ C'est incorrect. D'autres cotisations spécifiques financent l'assurance chômage.",
+                            "isCorrect": false
+                        }
+                    ]
+                },
+                {
+                    "question": "Quelle est la principale différence entre la 'Contribution au dialogue social' et la cotisation 'APEC' ?",
+                    "hint": "L'une est générale, l'autre est spécifique aux cadres et à un organisme précis.",
+                    "answerOptions": [
+                        {
+                            "text": "La Contribution au dialogue social est pour les entreprises de plus de 50 salariés, l'APEC pour toutes les entreprises.",
+                            "rationale": "❌ C'est incorrect. La Contribution au dialogue social s'applique à toutes les entreprises, et l'APEC est spécifique aux cadres.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "La Contribution au dialogue social finance les organisations syndicales, l'APEC finance l'Association Pour l'Emploi des Cadres.",
+                            "rationale": "✅ C'est la bonne réponse. La Contribution au dialogue social finance le dialogue social au niveau national et interprofessionnel. La cotisation APEC est une cotisation spécifique aux cadres qui finance l'Association Pour l'Emploi des Cadres, un organisme d'aide à l'emploi et au développement professionnel des cadres.",
+                            "isCorrect": true
+                        },
+                        {
+                            "text": "La Contribution au dialogue social est à la charge de l'employeur, l'APEC à la charge du salarié.",
+                            "rationale": "❌ C'est incorrect. Les deux sont des contributions patronales, bien que l'APEC ait aussi une part salariale minime.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "La Contribution au dialogue social est facultative, l'APEC est obligatoire.",
+                            "rationale": "❌ C'est incorrect. Les deux sont obligatoires.",
+                            "isCorrect": false
+                        }
+                    ]
+                },
+                {
+                    "question": "Quelle est la particularité de la 'Contribution Solidarité Autonomie (CSA)' parmi les autres contributions dues par l'employeur ?",
+                    "hint": "Elle est liée à une journée de travail spécifique.",
+                    "answerOptions": [
+                        {
+                            "text": "Elle finance la formation professionnelle continue.",
+                            "rationale": "❌ C'est incorrect. D'autres contributions financent la formation professionnelle.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Elle finance le Fonds National d'Aide au Logement (FNAL).",
+                            "rationale": "❌ C'est incorrect. Le FNAL est une autre contribution.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Elle est liée au financement des actions en faveur de l'autonomie des personnes âgées et handicapées (Journée de Solidarité).",
+                            "rationale": "✅ C'est la bonne réponse. La Contribution Solidarité Autonomie (CSA) est une contribution patronale qui finance des actions en faveur de l'autonomie des personnes âgées ou handicapées, notamment dans le cadre de la Journée de Solidarité.",
+                            "isCorrect": true
+                        },
+                        {
+                            "text": "Elle est uniquement due par les entreprises de plus de 250 salariés.",
+                            "rationale": "❌ C'est incorrect. Elle est due par tous les employeurs du secteur privé.",
+                            "isCorrect": false
+                        }
+                    ]
+                },
+                {
+                    "question": "Quelle est la principale différence entre la 'CSG déductible' et la 'CSG/CRDS non déductible' de l'impôt sur le revenu sur le bulletin de paie ?",
+                    "hint": "L'une réduit le revenu imposable, l'autre non.",
+                    "answerOptions": [
+                        {
+                            "text": "La CSG déductible finance la Sécurité Sociale, la non déductible finance le chômage.",
+                            "rationale": "❌ C'est incorrect. Les deux financent la solidarité et la protection sociale, la distinction est fiscale.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "La CSG déductible réduit le revenu imposable, la non déductible n'a pas cet effet.",
+                            "rationale": "✅ C'est la bonne réponse. La CSG déductible est une partie de la CSG qui peut être déduite du revenu brut global pour le calcul de l'impôt sur le revenu du salarié, réduisant ainsi l'assiette imposable. La partie non déductible de la CSG et la CRDS ne sont pas déductibles et restent donc imposables.",
+                            "isCorrect": true
+                        },
+                        {
+                            "text": "La CSG déductible est à la charge de l'employeur, la non déductible à la charge du salarié.",
+                            "rationale": "❌ C'est incorrect. Les deux sont des contributions salariales.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "La CSG déductible est calculée sur le net, la non déductible sur le brut.",
+                            "rationale": "❌ C'est incorrect. Les deux sont calculées sur une assiette proche du salaire brut, avec un abattement.",
+                            "isCorrect": false
+                        }
+                    ]
+                },
+                {
+                    "question": "Lors du calcul de la réduction générale des cotisations patronales (ex-Fillon), pourquoi le 'coefficient' de réduction est-il un élément clé ?",
+                    "hint": "Ce coefficient détermine le montant de la réduction.",
+                    "answerOptions": [
+                        {
+                            "text": "Il permet de déterminer l'éligibilité de l'entreprise à la réduction.",
+                            "rationale": "❌ C'est incorrect. L'éligibilité dépend de l'effectif et du niveau de salaire, pas du coefficient lui-même.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Il sert à calculer le montant de la réduction appliquée sur les cotisations patronales.",
+                            "rationale": "✅ C'est la bonne réponse. Le coefficient de la réduction générale est une formule mathématique qui, une fois calculée, est multipliée par la rémunération annuelle brute du salarié pour déterminer le montant total de la réduction des cotisations patronales applicable. C'est donc un élément déterminant du montant de l'allègement de charges.",
+                            "isCorrect": true
+                        },
+                        {
+                            "text": "Il indique le nombre d'heures supplémentaires exonérées.",
+                            "rationale": "❌ C'est incorrect. Le coefficient de la réduction générale n'est pas lié aux heures supplémentaires.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Il est utilisé pour proratiser le SMIC en cas de temps partiel.",
+                            "rationale": "❌ C'est incorrect. Le coefficient est spécifique à la réduction générale, pas à la proratisation du SMIC.",
+                            "isCorrect": false
+                        }
+                    ]
+                },
+                {
+                    "question": "Quel est l'impact de la 'Déduction TEPA' sur les heures supplémentaires et complémentaires pour le salarié ?",
+                    "hint": "C'est un allègement spécifique pour l'employeur.",
+                    "answerOptions": [
+                        {
+                            "text": "Elle augmente le salaire net imposable du salarié.",
+                            "rationale": "❌ C'est incorrect. La déduction TEPA est un allègement pour l'employeur, elle n'augmente pas le net imposable du salarié.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Elle réduit les cotisations sociales salariales sur ces heures.",
+                            "rationale": "❌ C'est incorrect. La réduction des cotisations salariales est un autre dispositif, distinct de la déduction TEPA qui est patronale.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Elle est une déduction forfaitaire patronale qui réduit le coût des heures pour l'employeur.",
+                            "rationale": "✅ C'est la bonne réponse. La Déduction TEPA (ou 'déduction forfaitaire patronale') est un allègement de charges sociales pour l'employeur, appliqué sur les heures supplémentaires et complémentaires. Elle vise à réduire le coût du travail pour l'entreprise.",
+                            "isCorrect": true
+                        },
+                        {
+                            "text": "Elle permet au salarié de ne pas déclarer ces heures aux impôts.",
+                            "rationale": "❌ C'est incorrect. L'exonération d'impôt pour le salarié est une autre mesure fiscale, distincte de la déduction TEPA.",
+                            "isCorrect": false
+                        }
+                    ]
+                },
+                {
+                    "question": "Pourquoi est-il crucial de vérifier le 'montant net social' sur le bulletin de paie avant de le transmettre au salarié ?",
+                    "hint": "Cette donnée est utilisée pour des démarches importantes du salarié.",
+                    "answerOptions": [
+                        {
+                            "text": "Pour s'assurer que le salarié peut le fournir comme justificatif d'identité.",
+                            "rationale": "❌ C'est incorrect. Le montant net social n'est pas un justificatif d'identité.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Pour garantir la conformité des déclarations de ressources du salarié aux organismes sociaux (CAF, MSA).",
+                            "rationale": "✅ C'est la bonne réponse. Le montant net social est une donnée clé pour le salarié, car c'est le montant qu'il doit déclarer aux organismes sociaux (comme la CAF ou la MSA) pour le calcul de ses droits à certaines prestations (RSA, prime d'activité). Une erreur ici peut avoir des conséquences directes sur les droits du salarié.",
+                            "isCorrect": true
+                        },
+                        {
+                            "text": "Pour calculer précisément le montant des cotisations patronales dues.",
+                            "rationale": "❌ C'est incorrect. Le montant net social est une donnée finale, pas une base de calcul des cotisations patronales.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Pour vérifier la bonne application du prélèvement à la source.",
+                            "rationale": "❌ C'est incorrect. Le prélèvement à la source est calculé sur le net imposable, pas directement sur le montant net social.",
+                            "isCorrect": false
+                        }
+                    ]
+                },
+                {
+                    "question": "En cas d'interruption collective du travail (ex: intempéries), les heures effectuées ultérieurement pour récupérer les heures perdues sont-elles considérées comme des heures supplémentaires ?",
+                    "hint": "Ces heures sont simplement un 'déplacement' du temps de travail normal.",
+                    "answerOptions": [
+                        {
+                            "text": "Oui, elles sont majorées à 25%.",
+                            "rationale": "❌ C'est incorrect. Ce sont des heures de récupération, pas des heures supplémentaires.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Oui, elles sont majorées à 50%.",
+                            "rationale": "❌ C'est incorrect. Ce sont des heures de récupération, pas des heures supplémentaires.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Non, elles sont considérées comme des heures normales simplement déplacées.",
+                            "rationale": "✅ C'est la bonne réponse. Les heures de récupération, effectuées suite à une interruption collective du travail due à des causes accidentelles ou intempéries, ne sont pas considérées comme des heures supplémentaires. Elles sont traitées comme des heures normales de travail, simplement reportées.",
+                            "isCorrect": true
+                        },
+                        {
+                            "text": "Uniquement si elles dépassent le contingent annuel.",
+                            "rationale": "❌ C'est incorrect. Le régime des heures de récupération est distinct de celui des heures supplémentaires et du contingent annuel.",
+                            "isCorrect": false
+                        }
+                    ]
+                },
+                {
+                    "question": "Quelle est la principale obligation de l'employeur concernant la dématérialisation du bulletin de paie depuis le 1er janvier 2017 ?",
+                    "hint": "Pensez aux droits du salarié et à la sécurité des données.",
+                    "answerOptions": [
+                        {
+                            "text": "Obtenir l'accord écrit et préalable de chaque salarié.",
+                            "rationale": "❌ C'est incorrect. L'accord préalable n'est plus nécessaire depuis cette date, sauf opposition du salarié.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Informer le salarié de son droit d'opposition et garantir l'intégrité/confidentialité des données et leur conservation.",
+                            "rationale": "✅ C'est la bonne réponse. Depuis le 1er janvier 2017, la dématérialisation du bulletin de paie est le principe. L'employeur doit informer le salarié de son droit de s'y opposer à tout moment, et doit garantir l'intégrité, la confidentialité des données, ainsi que la conservation et la disponibilité du bulletin électronique pendant 50 ans ou jusqu'aux 75 ans du salarié.",
+                            "isCorrect": true
+                        },
+                        {
+                            "text": "Transmettre le bulletin uniquement via un coffre-fort numérique personnel du salarié.",
+                            "rationale": "❌ C'est incorrect. L'employeur doit garantir la sécurité et la conservation, mais pas nécessairement via un coffre-fort numérique personnel spécifique au salarié.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Conserver le bulletin papier pendant 50 ans en plus de la version électronique.",
+                            "rationale": "❌ C'est incorrect. L'obligation de conservation du double papier est de 5 ans, et la durée de 50 ans/75 ans concerne la disponibilité du bulletin électronique pour le salarié.",
+                            "isCorrect": false
+                        }
+                    ]
+                },
+                {
+                    "question": "Quel est le principal avantage de l'utilisation d'un coffre-fort numérique pour la conservation des bulletins de paie ?",
+                    "hint": "Pensez à la sécurité et à l'accessibilité des documents sensibles.",
+                    "answerOptions": [
+                        {
+                            "text": "Réduire le salaire net à payer du salarié.",
+                            "rationale": "❌ C'est incorrect. L'utilisation d'un coffre-fort numérique n'a aucun impact sur le salaire net à payer.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Garantir la sécurité, la confidentialité et la disponibilité des documents électroniques sensibles.",
+                            "rationale": "✅ C'est la bonne réponse. Le coffre-fort numérique offre une protection élevée des documents grâce au chiffrement et à l'authentification, réduisant les risques de perte, vol ou consultation non autorisée. Il assure également l'accessibilité des documents à tout moment et de n'importe où.",
+                            "isCorrect": true
+                        },
+                        {
+                            "text": "Supprimer l'obligation de l'employeur de conserver les bulletins.",
+                            "rationale": "❌ C'est incorrect. L'employeur conserve ses obligations légales de conservation, même avec un coffre-fort numérique.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Permettre au salarié de modifier son bulletin de paie.",
+                            "rationale": "❌ C'est incorrect. Les documents dans un coffre-fort numérique doivent garantir l'intégrité des données, donc ne pas être modifiables par le salarié.",
+                            "isCorrect": false
+                        }
+                    ]
+                },
+                {
+                    "question": "Lors de la vérification du salaire net imposable, quels éléments doivent être ajoutés au salaire net (et non au net à payer) ?",
+                    "hint": "Ces éléments sont réintégrés pour le calcul fiscal.",
+                    "answerOptions": [
+                        {
+                            "text": "Les heures supplémentaires exonérées et les remboursements de frais.",
+                            "rationale": "❌ C'est incorrect. Les heures supplémentaires exonérées sont exclues du net imposable, et les remboursements de frais ne sont pas un élément de rémunération imposable.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "La CSG non déductible, la CRDS non déductible et la participation patronale à la mutuelle.",
+                            "rationale": "✅ C'est la bonne réponse. Pour obtenir le salaire net imposable, il faut ajouter au salaire net la part non déductible de la CSG et de la CRDS, ainsi que la participation patronale à la mutuelle (et à la prévoyance si applicable), car ces éléments sont considérés comme du revenu imposable bien qu'ils ne soient pas versés directement au salarié ou déduits de son salaire brut.",
+                            "isCorrect": true
+                        },
+                        {
+                            "text": "Les acomptes et les saisies sur salaire.",
+                            "rationale": "❌ C'est incorrect. Les acomptes et saisies sont des déductions du net à payer, pas des ajouts au net pour l'imposable.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Les primes d'ancienneté et les avantages en nature.",
+                            "rationale": "❌ C'est incorrect. Les primes d'ancienneté et les avantages en nature sont déjà inclus dans le salaire brut et donc dans le calcul du salaire net avant d'arriver au net imposable.",
+                            "isCorrect": false
+                        }
+                    ]
+                },
+                {
+                    "question": "Quelle est la principale différence entre le 'privilège général des salaires' et le 'superprivilège des salariés' en cas de difficultés financières de l'employeur ?",
+                    "hint": "L'un est plus fort que l'autre et s'applique dans des situations spécifiques.",
+                    "answerOptions": [
+                        {
+                            "text": "Le privilège général couvre tous les biens de l'employeur, le superprivilège est limité aux biens immobiliers.",
+                            "rationale": "❌ C'est incorrect. Le superprivilège n'est pas limité aux biens immobiliers.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Le privilège général garantit 6 mois de salaires, le superprivilège garantit les 60 derniers jours avec un rang de paiement supérieur.",
+                            "rationale": "✅ C'est la bonne réponse. Le privilège général des salaires garantit les créances salariales des six derniers mois sur tous les biens de l'employeur. Le superprivilège des salariés est un privilège de premier rang, qui garantit la rémunération des soixante derniers jours de travail, et s'applique en cas de procédure collective de l'employeur, assurant un paiement prioritaire.",
+                            "isCorrect": true
+                        },
+                        {
+                            "text": "Le privilège général s'applique en cas de procédure collective, le superprivilège en dehors.",
+                            "rationale": "❌ C'est incorrect. Le superprivilège s'applique spécifiquement en cas de procédure collective.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Le superprivilège est facultatif, le privilège général est obligatoire.",
+                            "rationale": "❌ C'est incorrect. Les deux sont des garanties légales obligatoires.",
+                            "isCorrect": false
+                        }
+                    ]
+                },
+                {
+                    "question": "Quelle est la conséquence si un employeur paie un salarié mineur directement, sans l'autorisation de son représentant légal et sans opposition de ce dernier ?",
+                    "hint": "Pensez au principe 'qui paye mal paye deux fois'.",
+                    "answerOptions": [
+                        {
+                            "text": "Le paiement est valide et l'employeur est libéré de son obligation.",
+                            "rationale": "❌ C'est incorrect. Le paiement direct à un mineur sans autorisation peut entraîner des conséquences pour l'employeur.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "L'employeur devra procéder à un nouveau versement au représentant légal.",
+                            "rationale": "✅ C'est la bonne réponse. Si le salaire d'un mineur est payé directement à celui-ci sans l'autorisation de son représentant légal, l'employeur risque de devoir payer une seconde fois le salaire au représentant légal, en application du principe 'qui paye mal paye deux fois'. L'absence d'opposition du représentant légal peut toutefois valoir autorisation tacite selon la jurisprudence.",
+                            "isCorrect": true
+                        },
+                        {
+                            "text": "Le salarié mineur sera sanctionné.",
+                            "rationale": "❌ C'est incorrect. La responsabilité incombe à l'employeur qui ne respecte pas les règles de paiement.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Le contrat de travail du mineur sera annulé.",
+                            "rationale": "❌ C'est incorrect. Le non-respect des modalités de paiement n'entraîne pas l'annulation du contrat de travail.",
+                            "isCorrect": false
+                        }
+                    ]
+                },
+                {
+                    "question": "Quel est le rôle du 'numéro de sécurité sociale' sur le bulletin de paie ?",
+                    "hint": "Il est essentiel pour l'identification du salarié et ses droits sociaux.",
+                    "answerOptions": [
+                        {
+                            "text": "Identifier l'employeur et son secteur d'activité.",
+                            "rationale": "❌ C'est incorrect. Le numéro SIRET et le code NAF/APE identifient l'employeur.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Permettre le calcul du salaire brut.",
+                            "rationale": "❌ C'est incorrect. Le numéro de sécurité sociale n'est pas utilisé pour le calcul du salaire brut.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Identifier le salarié auprès des organismes sociaux et gérer ses droits (retraite, maladie, etc.).",
+                            "rationale": "✅ C'est la bonne réponse. Le numéro de sécurité sociale est une mention obligatoire qui permet l'identification unique du salarié auprès de tous les organismes de protection sociale, assurant ainsi le suivi de ses droits en matière de retraite, maladie, chômage, etc.",
+                            "isCorrect": true
+                        },
+                        {
+                            "text": "Déterminer le taux de prélèvement à la source de l'impôt sur le revenu.",
+                            "rationale": "❌ C'est incorrect. Le taux de prélèvement à la source est transmis par l'administration fiscale, il n'est pas déterminé par le numéro de sécurité sociale.",
+                            "isCorrect": false
+                        }
+                    ]
+                },
+                {
+                    "question": "Quelle est la conséquence si un salarié payé au mois s'absente une journée sans justification ?",
+                    "hint": "La retenue sur salaire doit être proportionnelle au temps non travaillé.",
+                    "answerOptions": [
+                        {
+                            "text": "L'employeur ne peut pas opérer de retenue sur salaire.",
+                            "rationale": "❌ C'est incorrect. Le salaire est la contrepartie du travail, donc une absence non justifiée entraîne une retenue.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "La retenue opérée par l'employeur doit être strictement proportionnelle à la durée de l'absence.",
+                            "rationale": "✅ C'est la bonne réponse. En cas d'absence non rémunérée d'un salarié payé au mois, la retenue sur salaire doit être strictement proportionnelle au temps de travail non effectué. Le calcul se base sur le salaire mensuel divisé par l'horaire effectif du mois considéré, multiplié par le nombre d'heures d'absence.",
+                            "isCorrect": true
+                        },
+                        {
+                            "text": "Le salarié doit récupérer les heures d'absence en travaillant plus tard.",
+                            "rationale": "❌ C'est incorrect. La récupération d'heures perdues est pour des cas spécifiques d'interruption collective de travail, pas pour une absence individuelle injustifiée.",
+                            "isCorrect": false
+                        },
+                        {
+                            "text": "Le salaire du mois est réduit d'un montant forfaitaire fixé par la convention collective.",
+                            "rationale": "❌ C'est incorrect. La retenue est proportionnelle au temps réel perdu, pas un forfait, sauf si la convention collective prévoit une règle plus favorable.",
+                            "isCorrect": false
+                        }
+                    ]
+                }
+            ]
+        };
+
+        let currentQuestionIndex = 0; // Tracks the current question being displayed
+        let score = 0; // Stores the user's score
+        // Stores the index of the user's selected answer for each question (original index)
+        let userAnswers = new Array(quizData.questions.length).fill(null);
+        // Tracks if a question was answered correctly on the first attempt
+        let answeredCorrectly = new Array(quizData.questions.length).fill(false);
+
+        // Get references to DOM elements
+        const quizContainer = document.getElementById('quiz');
+        const prevButton = document.getElementById('prevButton');
+        const nextButton = document.getElementById('nextButton');
+        const restartButton = document.getElementById('restartButton');
+        const progressBar = document.getElementById('progressBar');
+        const liveScoreDisplay = document.getElementById('liveScoreDisplay');
+        const correctProgressElement = document.getElementById('correctProgress');
+        const incorrectProgressElement = document.getElementById('incorrectProgress');
+        const unansweredProgressElement = document.getElementById('unansweredProgress');
+
+
+        // Function to shuffle an array (Fisher-Yates algorithm)
+        // Modified to preserve the original index of each option
+        function shuffleArray(array) {
+            // Create a copy of the array with the original index
+            let indexedArray = array.map((item, index) => ({ item, originalIndex: index }));
+            for (let i = indexedArray.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [indexedArray[i], indexedArray[j]] = [indexedArray[j], indexedArray[i]];
+            }
+            return indexedArray;
+        }
+
+        // Function to display the current question and its options
+        function displayQuestion() {
+            const questionData = quizData.questions[currentQuestionIndex];
+            // Mélanger les options en conservant leur index d'origine
+            const shuffledOptionsWithOriginalIndex = shuffleArray([...questionData.answerOptions]);
+
+            // Remplir le conteneur du quiz avec le texte de la question, l'indice et les options de réponse
+            quizContainer.innerHTML = `
+                <div class="question-text">${currentQuestionIndex + 1}. ${questionData.question}</div>
+                <div id="answerOptions" class="flex flex-col gap-3">
+                    ${shuffledOptionsWithOriginalIndex.map(optionWrapper => `
+                        <div class="answer-option rounded-xl p-4 cursor-pointer transition-all duration-200 ease-in-out hover:bg-blue-100 hover:shadow-md"
+                             data-original-index="${optionWrapper.originalIndex}"
+                             onclick="selectAnswer(this, ${optionWrapper.originalIndex})">
+                            ${optionWrapper.item.text}
+                        </div>
+                    `).join('')}
+                </div>
+                <div id="hint" class="hint-text hidden mt-4">Indice : ${questionData.hint}</div>
+                <div id="rationaleContainer" class="mt-4 hidden"></div>
+            `;
+
+            // Restore previous selections and rationale if any
+            if (userAnswers[currentQuestionIndex] !== null) {
+                const selectedOptionElement = quizContainer.querySelector(`[data-original-index="${userAnswers[currentQuestionIndex]}"]`);
+                if (selectedOptionElement) {
+                    showRationale(selectedOptionElement, userAnswers[currentQuestionIndex]);
+                }
+            }
+
+            // Mettre à jour l'état des boutons de navigation et la barre de progression
+            updateNavigationButtons();
+            updateProgressBar();
+            updateLiveScoreDisplay(); // Mettre à jour l'affichage du score en direct
+        }
+
+        // Function to handle answer selection by the user
+        function selectAnswer(selectedElement, originalSelectedIndex) {
+            // If the question has already been answered, prevent new selection
+            if (userAnswers[currentQuestionIndex] !== null) {
+                return;
+            }
+
+            // Clear any previously selected option for single choice
+            const allOptions = quizContainer.querySelectorAll('.answer-option');
+            allOptions.forEach(option => option.classList.remove('selected'));
+
+            // Store the selected answer
+            userAnswers[currentQuestionIndex] = originalSelectedIndex;
+
+            // Show rationale and update score
+            showRationale(selectedElement, originalSelectedIndex);
+            nextButton.disabled = false; // Enable next button after selection
+        }
+
+        // Function to show rationale for all options and update the score
+        function showRationale(selectedElement, originalSelectedIndex) {
+            const questionData = quizData.questions[currentQuestionIndex];
+            const allOptionsElements = quizContainer.querySelectorAll('.answer-option');
+            const rationaleContainer = document.getElementById('rationaleContainer');
+            rationaleContainer.innerHTML = '';
+
+            let isCurrentAnswerCorrect = false; // To track if the selected answer is correct
+
+            allOptionsElements.forEach(optionElement => {
+                const optionOriginalIndex = parseInt(optionElement.dataset.originalIndex);
+                const optionData = questionData.answerOptions[optionOriginalIndex];
+                const isCorrectOption = optionData.isCorrect;
+                const rationaleText = optionData.rationale;
+
+                // Clear all color classes before applying new ones
+                optionElement.classList.remove('selected', 'correct', 'incorrect');
+
+                // Create a div for the rationale of each option
+                const rationaleDiv = document.createElement('div');
+                rationaleDiv.classList.add('rationale', 'rounded-lg', 'p-3', 'mb-2');
+                rationaleDiv.innerHTML = `<strong>${optionElement.innerText}:</strong> ${rationaleText}`;
+
+                // Color logic for answer options (the clicked element and others)
+                if (optionOriginalIndex === originalSelectedIndex) {
+                    // This is the option selected by the user
+                    optionElement.classList.add('selected'); // Yellow for the selected option
+                    if (isCorrectOption) {
+                        isCurrentAnswerCorrect = true;
+                        // If the selected answer is correct, its rationale is blue
+                        rationaleDiv.classList.add('correct-rationale');
+                    } else {
+                        // If the selected answer is incorrect, its rationale is yellow
+                        rationaleDiv.classList.add('selected-rationale');
+                    }
+                } else if (isCorrectOption) {
+                    // This is the correct answer, but not selected by the user
+                    optionElement.classList.add('correct'); // Bleu for the correct unselected answer
+                    rationaleDiv.classList.add('correct-rationale'); // Bleu for its rationale
+                } else {
+                    // This is a wrong answer, not selected by the user
+                    optionElement.classList.add('incorrect'); // Fuchsia for wrong unselected answers
+                    rationaleDiv.classList.add('incorrect-rationale'); // Fuchsia for its rationale
+                }
+
+                rationaleContainer.appendChild(rationaleDiv);
+            });
+
+            // Update score and `answeredCorrectly` status
+            if (userAnswers[currentQuestionIndex] !== null && answeredCorrectly[currentQuestionIndex] === false) {
+                if (isCurrentAnswerCorrect) {
+                    score++;
+                    answeredCorrectly[currentQuestionIndex] = true;
+                }
+            }
+
+            updateLiveScoreDisplay();
+            updateProgressBar(); // Update progress bar after selection
+            rationaleContainer.classList.remove('hidden');
+            allOptionsElements.forEach(option => option.style.pointerEvents = 'none'); // Disable clicks after selection
+            nextButton.disabled = false;
+        }
+
+        // Function to update the state of navigation buttons (Previous/Next)
+        function updateNavigationButtons() {
+            prevButton.disabled = currentQuestionIndex === 0;
+            // The Next button is disabled if the current question has not been answered yet
+            nextButton.disabled = userAnswers[currentQuestionIndex] === null;
+            nextButton.textContent = currentQuestionIndex === quizData.questions.length - 1 ? 'Voir les résultats' : 'Suivant';
+        }
+
+        // Function to update the colored progress bar
+        function updateProgressBar() {
+            const totalQuestions = quizData.questions.length;
+            let correctCount = 0;
+            let incorrectCount = 0;
+            let unansweredCount = 0;
+
+            for (let i = 0; i < totalQuestions; i++) {
+                if (userAnswers[i] !== null) {
+                    const originalOptionIndex = userAnswers[i];
+                    const isCorrect = quizData.questions[i].answerOptions[originalOptionIndex].isCorrect;
+                    if (isCorrect) {
+                        correctCount++;
+                    } else {
+                        incorrectCount++;
+                    }
+                } else {
+                    unansweredCount++;
+                }
+            }
+
+            const correctPercentage = (correctCount / totalQuestions) * 100;
+            const incorrectPercentage = (incorrectCount / totalQuestions) * 100;
+            const unansweredPercentage = (unansweredCount / totalQuestions) * 100;
+
+            correctProgressElement.style.width = `${correctPercentage}%`;
+            incorrectProgressElement.style.width = `${incorrectPercentage}%`;
+            unansweredProgressElement.style.width = `${unansweredPercentage}%`;
+
+            // Display percentages inside colored sections if > 0
+            correctProgressElement.textContent = correctPercentage > 0 ? `${correctPercentage.toFixed(0)}%` : '';
+            incorrectProgressElement.textContent = incorrectPercentage > 0 ? `${incorrectPercentage.toFixed(0)}%` : '';
+            unansweredProgressElement.textContent = unansweredPercentage > 0 ? `${unansweredPercentage.toFixed(0)}%` : '';
+        }
+
+        // Function to update the live score display
+        function updateLiveScoreDisplay() {
+            const totalQuestions = quizData.questions.length;
+            const currentQuestionNumber = currentQuestionIndex + 1;
+            const answeredCount = userAnswers.filter(answer => answer !== null).length; // Count questions that have been answered
+            
+            let correctCount = 0;
+            let incorrectCount = 0;
+
+            for (let i = 0; i < answeredCount; i++) {
+                if (userAnswers[i] !== null) {
+                    const originalOptionIndex = userAnswers[i];
+                    const isCorrect = quizData.questions[i].answerOptions[originalOptionIndex].isCorrect;
+                    if (isCorrect) {
+                        correctCount++;
+                    } else {
+                        incorrectCount++;
+                    }
+                }
+            }
+            
+            let percentageCorrect = 0;
+            let percentageIncorrect = 0;
+
+            if (answeredCount > 0) {
+                percentageCorrect = ((correctCount / answeredCount) * 100).toFixed(0);
+                percentageIncorrect = (((answeredCount - correctCount) / answeredCount) * 100).toFixed(0);
+            }
+
+            liveScoreDisplay.textContent = `Score : ${correctCount} / ${answeredCount} (${percentageCorrect}% de réussite, ${percentageIncorrect}% d'échecs) - Question ${currentQuestionNumber} / ${totalQuestions}`;
+        }
+
+        // Function to display final quiz results
+        function showResults() {
+            const totalQuestions = quizData.questions.length;
+            let finalCorrectCount = 0;
+            let finalIncorrectCount = 0;
+            let finalUnansweredCount = 0;
+
+            for (let i = 0; i < totalQuestions; i++) {
+                if (userAnswers[i] !== null) {
+                    const originalOptionIndex = userAnswers[i];
+                    const isCorrect = quizData.questions[i].answerOptions[originalOptionIndex].isCorrect;
+                    if (isCorrect) {
+                        finalCorrectCount++;
+                    } else {
+                        finalIncorrectCount++;
+                    }
+                } else {
+                    finalUnansweredCount++;
+                }
+            }
+
+            const finalCorrectPercentage = ((finalCorrectCount / totalQuestions) * 100).toFixed(0);
+            const finalIncorrectPercentage = ((finalIncorrectCount / totalQuestions) * 100).toFixed(0);
+            const finalUnansweredPercentage = ((finalUnansweredCount / totalQuestions) * 100).toFixed(0);
+
+            let feedbackMessage = "";
+            let celebrationContent = "";
+            let shareFeedbackMessage = ""; // Specific message for sharing
+
+            if (finalCorrectPercentage <= 25) {
+                feedbackMessage = `Votre score de ${finalCorrectPercentage}% de réussite est un bon début. Il est temps de revoir vos cours ! Continuez votre apprentissage en pratiquant et en regardant les lives. C'est essentiel pour progresser. 📚💡`;
+                shareFeedbackMessage = `Mon résultat est de ${finalCorrectPercentage}% de réussite. Il est temps de revoir mes cours et de progresser !`;
+            } else if (finalCorrectPercentage <= 50) {
+                feedbackMessage = `Votre score de ${finalCorrectPercentage}% de réussite est encourageant. C'est bien, continuez ainsi ! Le prochain palier est 75%. Pour y arriver, continuez à progresser, suivez les lives, appliquez les concepts et faites de la veille sociale. 💪🚀`;
+                shareFeedbackMessage = `Mon score est de ${finalCorrectPercentage}% de réussite. C'est encourageant, mais je vise plus haut !`;
+            } else if (finalCorrectPercentage <= 75) {
+                feedbackMessage = `Félicitations pour votre score de ${finalCorrectPercentage}% de réussite ! Vos efforts portent leurs fruits. Vous pouvez continuer à vous performer et viser l'excellence. 🌟🎯`;
+                shareFeedbackMessage = `J'ai obtenu ${finalCorrectPercentage}% de réussite ! Très bon score, je continue de m'améliorer !`;
+            } else { // > 75% up to 100%
+                feedbackMessage = `Félicitations pour votre score de ${finalCorrectPercentage}% de réussite ! 🎉🔥 Vous maîtrisez le sujet ! N'oubliez pas que nous sommes une équipe, motivez la troupe et le transfert de compétences est important : aidez les autres personnes. 🏅🎓`;
+                celebrationContent = `
+                    <p class="text-2xl font-bold text-yellow-500 mt-4">🎉🔥 MÉDAILLE D'OR ! 🔥🎉</p>
+                    <p class="text-xl font-semibold text-blue-600">Diplôme de Maîtrise du Règlement du Salaire !</p>
+                `;
+                shareFeedbackMessage = `J'ai atteint ${finalCorrectPercentage}% de réussite ! C'est la fête ! Je suis prêt à partager mes connaissances et à motiver la troupe !`;
+            }
+
+            // Get the quiz title from the <title> tag
+            const quizTitle = document.title;
+            // Construct the shareable message for Discord/WhatsApp
+            const shareMessage = `Voici les résultats obtenus lors de mon test quiz "${quizTitle}" ! J'ai eu ${finalCorrectPercentage}% de réussite. ${shareFeedbackMessage} Prêts à échanger sur Discord/WhatsApp pour progresser ensemble ?`;
+
+            quizContainer.innerHTML = `
+                <div class="score-display">Votre score final : ${finalCorrectCount} sur ${totalQuestions}</div>
+                <p class="text-lg text-gray-700 mb-4">Un aperçu de votre performance :</p>
+
+                <div class="progress-bar final-results-chart-container">
+                    <div class="progress-section correct-section" style="width: ${finalCorrectPercentage}%;">
+                        ${finalCorrectPercentage > 0 ? `${finalCorrectPercentage}%` : ''}
+                    </div>
+                </div>
+
+                <p class="text-xl font-semibold text-gray-800 mt-6">${feedbackMessage}</p>
+                ${celebrationContent}
+                <div class="mt-8 p-4 bg-gray-100 rounded-lg shadow-inner">
+                    <p class="text-lg font-semibold text-gray-700 mb-2">Partagez vos résultats et échangez !</p>
+                    <textarea id="shareableResult" class="w-full p-2 border rounded-md text-gray-700 bg-gray-50 mb-4" rows="4" readonly>${shareMessage}</textarea>
+                    <button id="copyResultButton" class="button bg-green-500 hover:bg-green-600 mb-4">Copier le message de partage</button>
+                    <p class="text-md text-gray-600 mb-2">Rejoignez la discussion sur :</p>
+                    <a href="https://discord.gg/cBnBkGDFgk" target="_blank" class="inline-block mt-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300">
+                        Discord 🔥 Payroll Boss Elite Club : Le Hub Paie & Progrès 📈
+                    </a>
+                    <a href="https://chat.whatsapp.com/FuBgQZStV0r2dgIDxJe2g9" target="_blank" class="inline-block mt-2 ml-2 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300">
+                        WhatsApp 🔥 | Payroll Boss Elite Club 👑| Infos & Actus
+                    </a>
+                </div>
+            `;
+
+            // Add copy to clipboard functionality
+            document.getElementById('copyResultButton').addEventListener('click', () => {
+                const shareableResult = document.getElementById('shareableResult');
+                shareableResult.select();
+                document.execCommand('copy');
+                // Optional: Provide visual feedback that text has been copied
+                shareableResult.style.borderColor = '#10B981'; // Green border
+                shareableResult.style.boxShadow = '0 0 0 2px #10B981';
+                setTimeout(() => {
+                    shareableResult.style.borderColor = '';
+                    shareableResult.style.boxShadow = '';
+                }, 1500);
+            });
+
+            // Hide navigation buttons and show restart button
+            prevButton.classList.add('hidden');
+            nextButton.classList.add('hidden');
+            restartButton.classList.remove('hidden');
+            liveScoreDisplay.classList.add('hidden'); // Hide live score display at the end
+        }
+
+        // Écouteur d'événement pour le bouton 'Suivant'
+        nextButton.addEventListener('click', () => {
+            if (currentQuestionIndex < quizData.questions.length - 1) {
+                currentQuestionIndex++; // Passer à la question suivante
+                displayQuestion(); // Afficher la nouvelle question
+            } else {
+                showResults(); // Si c'est la dernière question, afficher les résultats
+            }
+        });
+
+        // Écouteur d'événement pour le bouton 'Précédent'
+        prevButton.addEventListener('click', () => {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--; // Revenir à la question précédente
+                displayQuestion(); // Afficher la nouvelle question
+            } else {
+                // If on the first question and trying to go back, just re-display it
+                displayQuestion();
+            }
+        });
+
+        // Écouteur d'événement pour le bouton 'Recommencer le Quiz'
+        restartButton.addEventListener('click', () => {
+            currentQuestionIndex = 0; // Réinitialiser l'index de la question
+            score = 0; // Réinitialiser le score
+            userAnswers.fill(null); // Effacer les réponses de l'utilisateur
+            answeredCorrectly.fill(false); // Réinitialiser le suivi de la justesse
+            // Afficher les boutons de navigation et cacher le bouton de redémarrage
+            prevButton.classList.remove('hidden');
+            nextButton.classList.remove('hidden');
+            restartButton.classList.add('hidden');
+            liveScoreDisplay.classList.remove('hidden'); // Réafficher l'affichage du score en direct
+            displayQuestion(); // Commencer le quiz depuis le début
+        });
+
+        // Affichage initial de la première question au chargement de la page
+        displayQuestion();
+    </script>
+</body>
+</html>
